@@ -1,0 +1,19 @@
+# Node modules (for both frontend and backend)
+node_modules/
+client/node_modules/
+server/node_modules/
+
+# React build folder
+client/build/
+
+# Environment files
+client/.env
+server/.env
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
