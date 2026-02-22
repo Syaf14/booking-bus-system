@@ -1,44 +1,13 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
+import UserLayout from '../global/UserLayout';
 
 function Dashboard() {
   const navigate = useNavigate();
   return (
-    <div className='bg-light vh-100'>
-      <div className="text-white" style={{height:"10vh"}}>
-        <nav className='navbar'>
-          <a href="" className='nav-link'>
-            <div className="card" style={{width:"30vh"}}>
-              <div className="card-body">
-                Book Ticket
-              </div>
-            </div>
-          </a>
-          <a href="" className='nav-link'>
-            <div className="card" style={{width:"30vh"}}>
-              <div className="card-body">
-                Time Table
-              </div>
-            </div>
-          </a>
-          <a href="" className='nav-link'>
-            <div className="card" style={{width:"30vh"}}>
-              <div className="card-body">
-                My Ticket
-              </div>
-            </div>
-          </a>
-          <a href="" className='nav-link'>
-            <div className="card" style={{width:"30vh"}}>
-              <div className="card-body">
-                Profile
-              </div>
-            </div>
-          </a>
-        </nav>
-      </div>
-      <div style={{height:"90vh"}}>
-        <div className="d-flex justify-content-center align-items-center" style={{height:"100%"}}>
+    <UserLayout>
+      <div style={{height:"70vh"}}>
+        <div className="d-flex justify-content-center align-items-center" style={{height:"70vh"}}>
           <div className='d-flex flex-column'>
             <div className="card rounded-5 mb-4">
               <div className="card-body rounded-5 p-0">
@@ -49,12 +18,12 @@ function Dashboard() {
               </div>
             </div>
             <div className='d-flex justify-content-end'>
-              <a className='btn btn-danger rounded-5 px-5 py-2' onClick={() => navigate('/booking')}>Search Bus</a>
+              <a className='btn rounded-5 px-5 py-2 text-white' onClick={() => navigate('/booking')} style={{background:"#001aff"}}>Search Bus</a>
             </div> 
           </div>
         </div>
       </div>
-    </div>
+    </UserLayout>
   )
 }
 

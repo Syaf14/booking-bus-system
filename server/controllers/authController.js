@@ -55,3 +55,14 @@ exports.login = (req, res) => {
         })
     })
 }
+
+exports.logout = (req, res) => {
+    // Clear the cookie named 'token' (or whatever you named it)
+    res.clearCookie('token', {
+        httpOnly: true,
+        secure: true, // true if using HTTPS
+        sameSite: 'Strict'
+    });
+    
+    return res.status(200).json({ message: "Logged out successfully" });
+};

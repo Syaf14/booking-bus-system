@@ -1,6 +1,8 @@
 const express = require('express')
 const router = express.Router()
-const {  } = require('../controllers/bookingController')
+const { addbooking  } = require('../controllers/bookingController')
+
+router.post('/add-booking', addbooking)
 
 
 module.exports = router

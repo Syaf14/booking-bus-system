@@ -4,12 +4,26 @@ const jwt = require('jsonwebtoken')
 
 
 exports.addbooking = async (req, res) => {
-    const {user_id, trip_id, seat_type} = req.body
+    const { user_id, scheduled_id, seat_id } = req.body;
 
-    const insertSql = "INSERT INTO bookings (user_id,trip_id,seat_type) values (?, ?, ?)"
+    try {
+        // 1. Check if this specific seat is already booked for THIS schedule
+        const [existing] = await db.execute(
+            'SELECT id FROM bookings WHERE scheduled_id = ? AND seat_id = ? AND status = "confirmed"',
+            [scheduled_id, seat_id]
+        );
 
-    db.query(insertSql, [user_id, trip_id, seat_type], (err,result) => {
-        if (err) return res.status(500).json(err)
-            res.json({message: "Book add successfully"})
-    })
+        if (existing.length > 0) {
+            return res.status(400).json({ message: "This seat has just been taken. Please choose another." });
+        }
+
+        // 2. Insert the booking (matching your column names exactly)
+        const sql = `INSERT INTO bookings (user_id, scheduled_id, seat_id, status) VALUES (?, ?, ?, 'confirmed')`;
+        await db.execute(sql, [user_id, scheduled_id, seat_id]);
+
+        res.status(201).json({ success: true, message: "Booking confirmed!" });
+    } catch (error) {
+        console.error("DB Error:", error);
+        res.status(500).json({ message: "Database error", error: error.message });
+    }
 }

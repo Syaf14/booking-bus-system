@@ -14,6 +14,12 @@ import BookingManagement from './admin/BookingManagement';
 import SeatBooking from './seat-booking/SeatBooking';
 import UserManagement from './admin/UserManagement';
 import ReportNotificationManagement from './admin/ReportNotificationManagement';
+import AddBusRoute from './admin/bus_management/AddBusRoute';
+import EditBus from './admin/bus_management/EditBus';
+import AddScheduleManagement from './admin/schedule_management/AddScheduleManagement';
+import Profile from './pages/Profile';
+import Ticket from './pages/Ticket';
+import SeatBook from './booking/SeatBook';
 
 function App() {
   return (
@@ -24,15 +30,21 @@ function App() {
 
         <Route path="/admin-dashboard" element={<AdminDashboard />} />
         <Route path="/admin-bus-management" element={<BusManagement />}/>
+        <Route path="/admin-edit-bus-management/:id" element={<EditBus />} />
         <Route path="/admin-schedule-management" element={<ScheduleManagement />}/>
         <Route path="/admin-booking-management" element={<BookingManagement />}/>
         <Route path="/admin-user-management" element={<UserManagement />}/>
         <Route path="/admin-report-notification-management" element={<ReportNotificationManagement />}/>
         <Route path="/add-bus" element={<AddBus />}/>
+        <Route path="/add-bus-route" element={<AddBusRoute />} />
+        <Route path="/add-schedule-bus" element={<AddScheduleManagement />}/>
 
         <Route path="/student-dashboard" element={<Dashboard />} /> 
         <Route path="/booking" element={<Booking />}/>
         <Route path="/seat-booking" element={<SeatBooking />}/>
+        <Route path="/seat-booking/:id" element={<SeatBook />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/ticket" element={<Ticket />} />
       </Routes>
     </BrowserRouter>
   )

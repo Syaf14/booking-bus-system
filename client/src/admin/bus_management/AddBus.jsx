@@ -1,12 +1,15 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import AdminLayout from "../../global/AdminLayout";
 
 function AddBus() {
   const navigate = useNavigate();
   const [busCode, setBusCode] = useState("");
   const [busName, setBusName] = useState("");
-  const [capacity, setCapacity] = useState("");
+  const [capacitySeat, setCapacitySeat] = useState("");
+  const [capacityStanding, setCapacityStanding] = useState("");
+  const [plateNo, setPlateNo] = useState("");
   const [message, setMessage] = useState("");
 
   const handleSubmit = async (e) => {
@@ -18,14 +21,18 @@ function AddBus() {
         {
           bus_code: busCode,
           bus_name: busName,
-          capacity: capacity,
+          capacity_seat: capacitySeat,
+          capacity_standing: capacityStanding,
+          plate_no: plateNo,
         }
       );
 
       setMessage(response.data.message);
       setBusCode("");
       setBusName("");
-      setCapacity("");
+      setCapacitySeat("");
+      setCapacityStanding("");
+      setPlateNo("");
     } catch (error) {
       if (error.response) {
         setMessage(error.response.data.message);
@@ -36,49 +43,8 @@ function AddBus() {
   };
 
   return (
-    <div className='row col-md-12'>
-      <div className='col-3 bg-secondary p-0' style={{height:"100vh"}}>
-        <div className='title-navbar bg-white mb-3' style={{height:"30vh",width:"100%"}}>
-          <div className='d-flex justify-content-center align-items-center h-100'>
-            <h2>ADMIN SYSTEM</h2>
-          </div>
-        </div>
-        <div className="px-2 m-0">
-          <div className="card mb-2">
-            <div className="card-body">
-              <a className='btn' onClick={() => navigate('/admin-dashboard')}>DASHBOARD</a>
-            </div>
-          </div>
-          <div className="card mb-2">
-            <div className="card-body">
-              <a className='btn' onClick={() => navigate("/admin-bus-management")}>BUS MANAGEMENT</a>
-            </div>
-          </div>
-          <div className="card mb-2">
-            <div className="card-body">
-              <a className='btn'>SCHEDULE TIMETABLE</a>
-            </div>
-          </div>
-          <div className="card mb-2">
-            <div className="card-body">
-              <a className='btn'>BOOKING MANAGEMENT</a>
-            </div>
-          </div>
-          <div className="card mb-2">
-            <div className="card-body">
-              <a className='btn'>USER MANAGEMENT</a>
-            </div>
-          </div>
-          <div className="card mb-2">
-            <div className="card-body">
-              <a className='btn'>REPORT & NOTIFICATION</a>
-            </div>
-          </div>
-        </div>
-      </div>
-      {/* Main Content */}
-      <div className='col-9 bg-light' style={{height:"100vh"}}>
-        <div className="d-flex justify-content-end" style={{height:"10vh"}}>
+    <AdminLayout>
+              <div className="d-flex justify-content-end" style={{height:"10vh"}}>
             <button className="btn btn-secondary mx-3 my-3" onClick={() => navigate('/admin-bus-management')}>Back</button>
         </div>
         <div className="d-flex justify-content-center align-items-center" style={{minHeight:"90vh"}}>
@@ -112,16 +78,42 @@ function AddBus() {
                                     required
                                 />
                             </div>
-                            <div className="row mb-3">
-                                <label className="mb-2">Capacity:</label>
-                                <input
-                                    type="number"
-                                    className="form-control"
-                                    value={capacity}
-                                    onChange={(e) => setCapacity(e.target.value)}
-                                    required
-                                />
+                            <div className="d-flex justify-content-between mb-3">
+                              <div className="col-md-5">
+                                <div className="row">
+                                    <label className="mb-2">Capacity Seat:</label>
+                                    <input
+                                        type="number"
+                                        className="form-control"
+                                        value={capacitySeat}
+                                        onChange={(e) => setCapacitySeat(e.target.value)}
+                                        required
+                                    />
+                                </div>
+                              </div>
+                              <div className="col-md-5">
+                                <div className="row">
+                                    <label className="mb-2">Capacity Standing:</label>
+                                    <input
+                                        type="number"
+                                        className="form-control"
+                                        value={capacityStanding}
+                                        onChange={(e) => setCapacityStanding(e.target.value)}
+                                        required
+                                    />
+                                </div>
+                              </div>
                             </div>
+                              <div className="row mb-3">
+                                  <label className="mb-2">Plate No:</label>
+                                  <input
+                                      type="text"
+                                      className="form-control"
+                                      value={plateNo}
+                                      onChange={(e) => setPlateNo(e.target.value)}
+                                      required
+                                  />
+                              </div>
                             <div className="d-flex justify-content-end">
                                 <button type="submit" className="btn btn-success">Add Bus</button>
                             </div>
@@ -130,8 +122,7 @@ function AddBus() {
                 </div>
             </div>
         </div>
-      </div>
-    </div>
+    </AdminLayout>
   )
 }
 

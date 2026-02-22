@@ -1,8 +1,20 @@
+import axios from 'axios';
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 
 function AdminDashboard() {
   const navigate = useNavigate();
+
+  const handleLogout = () => {
+    // 1. (Optional) Call the backend logout API if you need to clear cookies
+    axios.post('http://localhost:5000/api/auth/logout') 
+    
+    // 2. Clear the token from storage
+    localStorage.removeItem('token'); 
+    
+    // 3. Redirect to login page
+    navigate('/');
+};
   return (
     <div className='row col-md-12'>
       <div className='col-3 bg-secondary p-0' style={{height:"100vh"}}>
@@ -47,8 +59,9 @@ function AdminDashboard() {
       {/* Main Content */}
       <div className='col-12 col-md-9 bg-light' style={{height:"100vh"}}>
         <div className='bg-white border-bottom border-3'style={{height:"20vh",width:"100%"}}>
-            <div className='px-5 d-flex align-items-center h-100 w-100'>
+            <div className='px-5 d-flex justify-content-between align-items-center h-100 w-100'>
                 <h1 className='fw-bold'>Dashboard</h1>
+                <button className='btn btn-primary' onClick={handleLogout}>Log Out</button>
             </div>
         </div>
       </div>

@@ -6,9 +6,11 @@ function BusManagement() {
     const navigate = useNavigate();
 
     const [buses, setBuses] = useState([]);
+    const [busRoute, setBusRoute] = useState([]);
 
     useEffect(() => {
         fetchBuses();
+        fetchBusRoutes();
     }, []);
 
     const fetchBuses = async () => {
@@ -20,11 +22,29 @@ function BusManagement() {
         }
     };
 
+    const fetchBusRoutes = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/api/busManagement/all-bus-route")
+        setBusRoute(response.data);
+        } catch (err) {
+        console.error(err);
+      }
+    }
+
     const handleDelete = async (id) => {
         // Optional: implement soft delete
         try {
         await axios.delete(`http://localhost:5000/api/busManagement/delete-bus/${id}`);
         fetchBuses(); // refresh list
+        } catch (err) {
+        console.error(err);
+        }
+    };
+    const handleDeleteRoute = async (id) => {
+        // Optional: implement soft delete
+        try {
+        await axios.delete(`http://localhost:5000/api/busManagement/delete-bus-route/${id}`);
+        fetchBusRoutes(); // refresh list
         } catch (err) {
         console.error(err);
         }
@@ -77,21 +97,28 @@ function BusManagement() {
                 <h1 className='fw-bold'>Bus Management</h1>
             </div>
         </div>
-        <div className='py-3 px-3'>
-            <button className='btn btn-success' onClick={() => navigate('/add-bus')}>+ADD BUS</button>
+        <div className='d-flex justify-content-end py-3 px-3'>
+            <button className='btn btn-success mx-3' onClick={() => navigate('/add-bus')}>+ADD BUS</button>
+            <button className='btn btn-success' onClick={() => navigate('/add-bus-route')}>+ADD BUS ROUTE</button>
         </div>
-        <div>
+        <div className='mb-5'>
             <table className='table table-bordered'>
                 <thead className=''>
-                    <tr>
-                        <td>
+                    <tr className='text-center'>
+                        <td style={{width:"5vh"}}>
+                            NO
+                        </td>
+                        <td style={{width:"15vh"}}>
                             BUS CODE
                         </td>
                         <td>
                             BUS NAME
                         </td>
                         <td>
-                            CAPACITY
+                            CAPACITY(SEAT)
+                        </td>
+                        <td>
+                            CAPACITY(STAND)
                         </td>
                         <td>
                             STATUS
@@ -102,11 +129,13 @@ function BusManagement() {
                     </tr>
                 </thead>
                 <tbody>
-                    {buses.map((bus) => (
+                    {buses.map((bus,index) => (
                         <tr key={bus.id}>
+                        <td>{index + 1}</td>
                         <td>{bus.bus_code}</td>
                         <td>{bus.bus_name}</td>
-                        <td>{bus.capacity}</td>
+                        <td>{bus.capacity_seat}</td>
+                        <td>{bus.capacity_standing}</td>
                         <td className='col text-center'>
                             <span className={`badge ${bus.deleted_at ? 'bg-danger' : 'bg-success'}`}>
                             {bus.deleted_at ? 'INACTIVE' : 'ACTIVE'}
@@ -114,7 +143,7 @@ function BusManagement() {
                         </td>
                         <td className='text-center'>
                             <div className='btn-group text-white'>
-                            <button className='btn btn-info'>EDIT</button>
+                            <button className='btn btn-secondary' onClick={() => navigate(`/admin-edit-bus-management/${bus.id}`)}>EDIT</button>
                             <button className='btn btn-danger' onClick={() => handleDelete(bus.id)}>DELETE</button>
                             </div>
                         </td>
@@ -127,6 +156,44 @@ function BusManagement() {
                     )}
                 </tbody>
             </table>
+        </div>
+        <div>
+          <table className='table table-bordered'>
+            <thead>
+                <tr className='text-center'>
+                  <td style={{width:"5vh"}}>NO</td>
+                  <td style={{width:"15vh"}}>BUS CODE</td>
+                  <td>DEPART LOCATION</td>
+                  <td>DEPART TIME</td>
+                  <td>ARRIVE LOCATION</td>
+                  <td>ARRIVE TIME</td>
+                  <td>ACTION</td>
+                </tr>
+            </thead>
+            <tbody>
+              {busRoute.map((bus, index) => (
+                <tr key={bus.id} className='text-center'>
+                  <td>{index + 1}</td>
+                  <td>{bus.bus_code}</td>
+                  <td>{bus.depart_location}</td>
+                  <td>{bus.depart_time}</td>
+                  <td>{bus.arrive_location}</td>
+                  <td>{bus.arrive_time}</td>
+                  <td className='text-center'>
+                    <div className='btn-group text-white'>
+                    <button className='btn btn-secondary'>EDIT</button>
+                    <button className='btn btn-danger' onClick={() => handleDeleteRoute(bus.id)}>DELETE</button>
+                    </div>
+                  </td>
+                </tr>                
+              ))}
+              {busRoute.length === 0 && (
+                  <tr>
+                  <td colSpan="6" className="text-center">No bus routes found</td>
+                  </tr>
+              )}              
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
