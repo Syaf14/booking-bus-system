@@ -1,62 +1,70 @@
-const db = require('../config/db')
-const bcrypt = require('bcrypt')
-const jwt = require('jsonwebtoken')
+const db = require('../config/db');
 
 exports.addroutebus = async (req, res) => {
-    const { bus_id, depart_location, depart_time, arrive_location, arrive_time } = req.body
-    const checkBusRoute = "SELECT * FROM bus_routes where bus_id = ? AND deleted_at IS NULL"
+    try {
+        const { bus_id, depart_location, depart_time, arrive_location, arrive_time } = req.body;
 
-    db.query(checkBusRoute, [bus_id], async (err,result) => {
-        if (result.length > 0) {
-            return res.status(400).json({message: "bus already have trip" })
+        // 1. Check if the bus already has an active trip
+        const checkBusRoute = "SELECT * FROM bus_routes WHERE bus_id = ? AND deleted_at IS NULL";
+        const [existingRoutes] = await db.query(checkBusRoute, [bus_id]);
+
+        if (existingRoutes.length > 0) {
+            return res.status(400).json({ message: "Bus already has an active trip" });
         }
 
-        const insertSql = "INSERT INTO bus_routes (bus_id, depart_location, depart_time, arrive_location, arrive_time) VALUES (?, ?, ?, ?, ?)"
+        // 2. Insert the new route
+        const insertSql = `
+            INSERT INTO bus_routes (bus_id, depart_location, depart_time, arrive_location, arrive_time) 
+            VALUES (?, ?, ?, ?, ?)
+        `;
+        await db.query(insertSql, [bus_id, depart_location, depart_time, arrive_location, arrive_time]);
 
-        db.query(insertSql, [bus_id, depart_location, depart_time, arrive_location, arrive_time], (err,result) => {
-            if(err) return res.status(500).json(err)
-            res.json({message: "add route to bus successfully"})
-        })
-    })
-}
-
-exports.getAllBusRoutes = (req, res) => {
-    const sql = `SELECT
-    br.id,
-    br.depart_location,
-    br.depart_time,
-    br.arrive_location,
-    br.arrive_time,
-    b.bus_name,
-    b.bus_code,
-    b.plate_no
-
-    FROM bus_routes br
-    LEFT JOIN buses b ON b.id = br.bus_id
-    WHERE br.deleted_at IS NULL`;
-    db.query(sql, (err,result) => {
-        if (err) return res.status(500).json(err);
-        res.json(result);
-    });
+        res.json({ message: "Route added to bus successfully" });
+    } catch (err) {
+        console.error("Error adding bus route:", err);
+        res.status(500).json({ message: "Server error", error: err.message });
+    }
 };
 
-exports.deleteBusRoute = (req, res) => {
-    const id = req.params.id;
+exports.getAllBusRoutes = async (req, res) => {
+    try {
+        const sql = `
+            SELECT
+                br.id,
+                br.depart_location,
+                br.depart_time,
+                br.arrive_location,
+                br.arrive_time,
+                b.bus_name,
+                b.bus_code,
+                b.plate_no
+            FROM bus_routes br
+            LEFT JOIN buses b ON b.id = br.bus_id
+            WHERE br.deleted_at IS NULL
+        `;
+        
+        const [rows] = await db.query(sql);
+        res.json(rows);
+    } catch (err) {
+        console.error("Error fetching routes:", err);
+        res.status(500).json({ message: "Database error", error: err.message });
+    }
+};
 
-    console.log("Bus ID: ", id);
+exports.deleteBusRoute = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const sql = 'UPDATE bus_routes SET deleted_at = NOW() WHERE id = ?';
 
-    const sql = 'UPDATE bus_routes SET deleted_at = NOW() WHERE id = ?';
+        const [result] = await db.query(sql, [id]);
 
-    db.query(sql, [id], (err, result) => {
-        if(err){
-            console.log(err);
-            return res.status(500).json({
-                message: "Delete failed"
-            });
+        if (result.affectedRows > 0) {
+            res.json({ message: "Bus route deleted successfully" });
+        } else {
+            res.status(404).json({ message: "Route not found" });
         }
-
-        res.json({
-            message: "Bus deleted successfully"
-        });
-    })
-}
+    } catch (err) {
+        console.error("Delete error:", err);
+        res.status(500).json({ message: "Delete failed", error: err.message });
+    }
+};

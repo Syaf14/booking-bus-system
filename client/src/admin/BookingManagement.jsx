@@ -1,87 +1,82 @@
-import React from 'react'
+import axios from 'axios';
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import AdminLayout from '../global/AdminLayout';
 
 function BookingManagement() {
     const navigate = useNavigate();
+    const [booking, setBooking] = useState([]);
+
+    useEffect(() => {
+      fetchBooking();
+    }, []);
+
+    const fetchBooking = async () => {
+        try {
+        const response = await axios.get("http://localhost:5000/api/bookingManagement/get-booking-management");
+        setBooking(response.data);
+        } catch (err) {
+        console.error(err);
+        }
+    };
   return (
-        <div className='row col-md-12'>
-      <div className='col-3 bg-secondary p-0' style={{height:"100vh"}}>
-        <div className='title-navbar bg-white mb-3' style={{height:"15vh",width:"100%"}}>
-          <div className='d-flex justify-content-center align-items-center h-100'>
-            <h2 className='fst-italic'>ADMIN SYSTEM</h2>
-          </div>
-        </div>
-        <div className='px-2 m-0'>
-          <div className="card mb-2">
-            <div className="card-body">
-              <a className='btn' onClick={() => navigate('/admin-dashboard')}><i className="bi bi-house-door-fill mx-3"></i>DASHBOARD</a>
-            </div>
-          </div>
-          <div className="card mb-2">
-            <div className="card-body">
-              <a className='btn' onClick={() => navigate("/admin-bus-management")}><i className="bi bi-bus-front-fill mx-3"></i>BUS MANAGEMENT</a>
-            </div>
-          </div>
-          <div className="card mb-2">
-            <div className="card-body">
-              <a className='btn' onClick={() => navigate('/admin-schedule-management')}><i className="bi bi-calendar-week mx-3"></i>SCHEDULE TIMETABLE</a>
-            </div>
-          </div>
-          <div className="card mb-2">
-            <div className="card-body">
-              <a className='btn' onClick={() => navigate('/admin-booking-management')}><i className="bi bi-journal-bookmark-fill mx-3"></i>BOOKING MANAGEMENT</a>
-            </div>
-          </div>
-          <div className="card mb-2">
-            <div className="card-body">
-              <a className='btn' onClick={() => navigate('/admin-user-management')}><i className="bi bi-people-fill mx-3"></i>USER MANAGEMENT</a>
-            </div>
-          </div>
-          <div className="card mb-2">
-            <div className="card-body">
-              <a className='btn' onClick={() => navigate('/admin-report-notification-management')}><i className="bi bi-card-text mx-3"></i>REPORT & NOTIFICATION</a>
-            </div>
-          </div>
-        </div>
-      </div>
-      {/* Main Content */}
-      <div className='col-12 col-md-9 bg-light' style={{height:"100vh"}}>
+    <AdminLayout>
         <div className='bg-white border-bottom border-3'style={{height:"20vh",width:"100%"}}>
             <div className='px-5 d-flex align-items-center h-100 w-100'>
                 <h1 className='fw-bold'>Booking Management</h1>
             </div>
         </div>
-        <div>
-          <table className='table table-bordered'>
+        <div className='card'>
+          <div className="card-header">
+            <div className='d-flex justify-content-end'>
+              <div className='d-flex'>
+                <input type="text" className='form-control mx-3' placeholder="Search..."/>
+                <button className='btn btn-primary'>Search</button>                
+              </div>
+            </div>
+          </div>
+          <div className="card-body">
+            <table className='table table-bordered'>
                 <thead className=''>
-                    <tr>
-                        <td className='' style={{width:"15vh"}}>
-                            BOOKING ID
+                    <tr className='text-center'>
+                        <td className='' style={{width:"5vh"}}>
+                            No
                         </td>
                         <td>
-                            STUDENT_ID
+                            Email Student
                         </td>
                         <td>
-                            BUS_CODE
+                            Bus Code
                         </td>
                         <td>
-                            SEAT TYPE
-                        </td>
-                        <td>
-                            STATUS
-                        </td>
-                        <td>
-                            ACTION
-                        </td>                       
+                            Seat Type
+                        </td> 
+                        <td style={{width:"40vh"}}>
+                            Action  
+                        </td>                      
                     </tr>
                 </thead>
                 <tbody>
-
+                  {booking.map((book, index) => (
+                    <tr key={book.id || index} className='text-center'> {/* Added fallback key */}
+                      <td>{index + 1}</td>
+                      <td>{book.email}</td>
+                      <td>{book.bus_code}</td> {/* This now works with the updated SQL */}
+                      <td>{book.seat_number} ({book.seat_type})</td>
+                      <td>
+                        <div className='btn-group'>
+                          <a href="" className='btn btn-secondary'><i className="bi bi-pencil-square mx-1"></i>Edit</a>
+                          <a href="" className='btn btn-primary'><i className="bi bi-eye-fill mx-1"></i>View</a>
+                          <a href="" className='btn btn-danger'><i className="bi bi-trash-fill mx-1"></i>Delete</a>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
             </table>
+          </div>
         </div>
-      </div>
-    </div>
+    </AdminLayout>
   )
 }
 

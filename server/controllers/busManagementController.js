@@ -3,137 +3,110 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 
 exports.addbus = async (req, res) => {
-  try {
-    const { bus_code, bus_name, capacity_seat, capacity_standing, plate_no } = req.body;
-    const busCodeTrim = bus_code.trim(); // remove spaces
+    try {
+        const { bus_code, bus_name, capacity_seat, capacity_standing, plate_no } = req.body;
+        const busCodeTrim = bus_code.trim();
 
-    // 1️⃣ Check if an active bus with same code exists
-    const checkSql = "SELECT * FROM buses WHERE bus_code = ? AND deleted_at IS NULL";
-    db.query(checkSql, [busCodeTrim], async (err, result) => {
-      if (err) {
-        console.error("Error checking bus code:", err);
-        return res.status(500).json({ message: "Database error", error: err });
-      }
-
-      if (result.length > 0) {
-        // Active bus exists → cannot insert
-        return res.status(400).json({ message: "Code already exists for an active bus" });
-      }
-
-      // 2️⃣ Check if there is a soft-deleted row with same code
-      const deletedSql = "SELECT * FROM buses WHERE bus_code = ? AND deleted_at IS NOT NULL";
-      db.query(deletedSql, [busCodeTrim], (err, deletedResult) => {
-        if (err) {
-          console.error("Error checking soft-deleted bus:", err);
-          return res.status(500).json({ message: "Database error", error: err });
+        // 1️⃣ Check for active bus
+        const [activeBus] = await db.query("SELECT * FROM buses WHERE bus_code = ? AND deleted_at IS NULL", [busCodeTrim]);
+        if (activeBus.length > 0) {
+            return res.status(400).json({ message: "Code already exists for an active bus" });
         }
 
-        if (deletedResult.length > 0) {
-          // Soft-deleted bus exists → "restore" it
-          const restoreSql =
-            "UPDATE buses SET bus_name = ?, capacity_seat = ?, capacity_standing = ?, plate_no = ?, deleted_at = NULL WHERE bus_code = ?";
-          db.query(
-            restoreSql,
-            [bus_name, capacity_seat, capacity_standing, plate_no, busCodeTrim],
-            (err, updateResult) => {
-              if (err) {
-                console.error("Error restoring bus:", err);
-                return res.status(500).json({ message: "Database update error", error: err });
-              }
-              return res.json({ message: "Bus restored successfully" });
-            }
-          );
-        } else {
-          // 3️⃣ No duplicates → insert new row
-          const insertSql =
-            "INSERT INTO buses (bus_code, bus_name, capacity_seat, capacity_standing, plate_no) VALUES (?, ?, ?, ?, ?)";
-          db.query(
-            insertSql,
-            [busCodeTrim, bus_name, capacity_seat, capacity_standing, plate_no],
-            (err, insertResult) => {
-              if (err) {
-                console.error("Error inserting bus:", err);
-                return res.status(500).json({ message: "Database insert error", error: err });
-              }
-              return res.json({ message: "Bus added successfully" });
-            }
-          );
-        }
-      });
-    });
-  } catch (err) {
-    console.error("Unexpected error:", err);
-    res.status(500).json({ message: "Server error", error: err });
-  }
-};
+        // 2️⃣ Check for soft-deleted bus
+        const [deletedBus] = await db.query("SELECT * FROM buses WHERE bus_code = ? AND deleted_at IS NOT NULL", [busCodeTrim]);
 
-exports.getAllBuses = (req, res) => {
-  const sql = "SELECT * FROM buses WHERE deleted_at IS NULL"; // ignore soft-deleted
-  db.query(sql, (err, result) => {
-    if (err) return res.status(500).json(err);
-    res.json(result);
-  });
-};
-
-exports.getBusesByID = (req, res) => {
-    const busID = req.params.id;
-
-    const sql = "SELECT * FROM buses WHERE id = ?";
-
-    db.query(sql,[busID], (err, result) => {
-        if (err) return res.status(500).json(err);
-        if (result.length > 0) {
-            res.json(result[0]); // Send the first (and only) bus object
-        } else {
-            res.status(404).json({ message: "Bus not found" });
-        }
-    });
-};
-
-exports.getBusSeat = (req, res) => {
-  const sql = `SELECT * FROM bus_seats WHERE deleted_at IS NULL`;
-
-  db.query(sql,(err,result) => {
-    if (err) return res.status(500).json(err);
-    res.json(result);
-  })
-};
-
-exports.updateBus = (req,res) => {
-    const busID = req.params.id;
-    const { bus_code, bus_name, capacity_seat, capacity_standing } = req.body;
-    const sql = "UPDATE buses SET bus_code = ?, bus_name = ?, capacity_seat = ?, capacity_standing = ? WHERE id = ?";
-
-    db.query(sql,[bus_code, bus_name, capacity_seat, capacity_standing, busID], (err, result) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).json(err);
+        if (deletedBus.length > 0) {
+            // Restore logic
+            await db.query(
+                "UPDATE buses SET bus_name = ?, capacity_seat = ?, capacity_standing = ?, plate_no = ?, deleted_at = NULL WHERE bus_code = ?",
+                [bus_name, capacity_seat, capacity_standing, plate_no, busCodeTrim]
+            );
+            return res.json({ message: "Bus restored successfully" });
         }
 
-        // 3. Check affectedRows instead of result.length
+        // 3️⃣ Insert new row
+        await db.query(
+            "INSERT INTO buses (bus_code, bus_name, capacity_seat, capacity_standing, plate_no) VALUES (?, ?, ?, ?, ?)",
+            [busCodeTrim, bus_name, capacity_seat, capacity_standing, plate_no]
+        );
+        res.json({ message: "Bus added successfully" });
+
+    } catch (err) {
+        res.status(500).json({ message: "Server error", error: err.message });
+    }
+};
+
+exports.getAllBuses = async (req, res) => {
+    try {
+        const [rows] = await db.query("SELECT * FROM buses WHERE deleted_at IS NULL");
+        res.json(rows);
+    } catch (err) {
+        res.status(500).json(err);
+    }
+};
+
+exports.getBusesByID = async (req, res) => {
+    try {
+        const [rows] = await db.query("SELECT * FROM buses WHERE id = ?", [req.params.id]);
+        if (rows.length > 0) return res.json(rows[0]);
+        res.status(404).json({ message: "Bus not found" });
+    } catch (err) {
+        res.status(500).json(err);
+    }
+};
+
+exports.getBusSeat = async (req, res) => {
+    try {
+        const sql = `SELECT * FROM bus_seats WHERE deleted_at IS NULL`;
+        const [rows] = await db.query(sql);
+        res.json(rows);
+    } catch (err) {
+        console.error("Error fetching seats:", err);
+        res.status(500).json({ message: "Database error", error: err.message });
+    }
+};
+
+exports.updateBus = async (req, res) => {
+    try {
+        const busID = req.params.id;
+        const { bus_code, bus_name, capacity_seat, capacity_standing } = req.body;
+        
+        const sql = `
+            UPDATE buses 
+            SET bus_code = ?, bus_name = ?, capacity_seat = ?, capacity_standing = ? 
+            WHERE id = ?
+        `;
+
+        // We destructure 'result' because it's not a list of rows, 
+        // but an object containing 'affectedRows'
+        const [result] = await db.query(sql, [bus_code, bus_name, capacity_seat, capacity_standing, busID]);
+
         if (result.affectedRows > 0) {
             res.json({ message: "Update successful" });
         } else {
             res.status(404).json({ message: "Bus not found or no changes made" });
         }
-    });
-}
+    } catch (err) {
+        console.error("Update error:", err);
+        res.status(500).json({ message: "Update failed", error: err.message });
+    }
+};
 
-exports.deleteBuses = (req, res) => {
-    const id = req.params.id;
+exports.deleteBuses = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const sql = "UPDATE buses SET deleted_at = NOW() WHERE id = ?";
 
-    const sql = "UPDATE buses SET deleted_at = NOW() where id = ?";
+        const [result] = await db.query(sql, [id]);
 
-        db.query(sql, [id], (err, result) => {
-        if(err){
-            console.log(err);
-            return res.status(500).json({
-                message: "Delete failed"
-            });
+        if (result.affectedRows > 0) {
+            res.json({ message: "Bus deleted successfully" });
+        } else {
+            res.status(404).json({ message: "Bus not found" });
         }
-
-        res.json({
-            message: "Bus deleted successfully"
-        });
-    })
-}
+    } catch (err) {
+        console.error("Delete error:", err);
+        res.status(500).json({ message: "Delete failed", error: err.message });
+    }
+};

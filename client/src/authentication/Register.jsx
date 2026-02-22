@@ -20,7 +20,6 @@ function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
       const res = await API.post("/auth/register", form);
       alert(res.data.message);
@@ -31,32 +30,95 @@ function Register() {
   };
 
   return (
-    <div className="h-100">
-        <div className="d-flex justify-content-center align-items-center min-vh-100">
-            <div className="card bg-light" style={{height:"60vh",width:"50vh"}}>
-                <div className="card-title text-center" style={{height:"20vh"}}>
-                  <div className="d-flex justify-content-center align-items-center" style={{height:"100%"}}>
-                    <div className="d-flex flex-column">
-                      <h1>T-Commerce</h1>
-                      <p className="fst-italic">"book your college bus here"</p>  
-                    </div>                  
-                  </div>
-                </div>
-                <div className="card-body">
-                    <form onSubmit={handleSubmit}>
-                    <input className='form-control mb-2' name="name" onChange={handleChange} placeholder="Name" />
-                    <input className="form-control mb-2" name="email" onChange={handleChange} placeholder="Email" />
-                    <input className="form-control mb-4" name="password" type="password" onChange={handleChange} placeholder="Password" />
-                    <div className="d-flex flex-column">
-                      <a className="btn fs-6" onClick={() => navigate("/")}>Sign in</a>
-                      <button className="btn btn-success" type="submit">Register</button>
-                    </div>
-                    </form>                     
-                </div>
-            </div>   
+    <div className="min-vh-100 d-flex align-items-center justify-content-center" 
+         style={{ 
+           background: "linear-gradient(135deg, #35557E 0%, #1150af 100%)",
+           padding: "40px 20px" 
+         }}>
+      
+      <div className="card border-0 shadow-lg overflow-hidden" 
+           style={{ maxWidth: "600px", width: "100%", borderRadius: "25px" }}>
+        
+        {/* Header Section */}
+        <div className="p-4 text-center bg-white border-bottom">
+          <h2 className="fw-bold mb-1" style={{ color: "#35557E" }}>Join T-Commerce</h2>
+          <p className="text-muted small mb-0">Create your account to start booking bus seats</p>
         </div>
-    </div>
 
+        {/* Form Section */}
+        <div className="card-body p-4 p-md-5 bg-white">
+          <form onSubmit={handleSubmit}>
+            
+            {/* Full Name */}
+            <div className="mb-3">
+              <label className="small fw-bold text-muted mb-1">Full Name</label>
+              <div className="input-group border rounded-pill px-3 py-1">
+                <span className="input-group-text bg-transparent border-0"><i className="bi bi-person text-muted"></i></span>
+                <input className="form-control border-0 shadow-none bg-transparent" name="name" onChange={handleChange} placeholder="John Doe" required />
+              </div>
+            </div>
+
+            <div className="row">
+              {/* Email */}
+              <div className="col-md-6 mb-3">
+                <label className="small fw-bold text-muted mb-1">Email</label>
+                <div className="input-group border rounded-pill px-3 py-1">
+                  <span className="input-group-text bg-transparent border-0"><i className="bi bi-envelope text-muted"></i></span>
+                  <input className="form-control border-0 shadow-none bg-transparent" name="email" onChange={handleChange} placeholder="email@uni.edu" required />
+                </div>
+              </div>
+              {/* Phone */}
+              <div className="col-md-6 mb-3">
+                <label className="small fw-bold text-muted mb-1">Phone Number</label>
+                <div className="input-group border rounded-pill px-3 py-1">
+                  <span className="input-group-text bg-transparent border-0"><i className="bi bi-phone text-muted"></i></span>
+                  <input className="form-control border-0 shadow-none bg-transparent" placeholder="012-3456789" />
+                </div>
+              </div>
+            </div>
+
+            {/* Student ID */}
+            <div className="mb-3">
+              <label className="small fw-bold text-muted mb-1">Student ID</label>
+              <div className="input-group border rounded-pill px-3 py-1">
+                <span className="input-group-text bg-transparent border-0"><i className="bi bi-card-text text-muted"></i></span>
+                <input className="form-control border-0 shadow-none bg-transparent" placeholder="SW0101xxx" />
+              </div>
+            </div>
+
+            <div className="row">
+              {/* Password */}
+              <div className="col-md-6 mb-3">
+                <label className="small fw-bold text-muted mb-1">Password</label>
+                <div className="input-group border rounded-pill px-3 py-1">
+                  <span className="input-group-text bg-transparent border-0"><i className="bi bi-lock text-muted"></i></span>
+                  <input className="form-control border-0 shadow-none bg-transparent" name="password" type="password" onChange={handleChange} placeholder="••••••••" required />
+                </div>
+              </div>
+              {/* Confirm Password */}
+              <div className="col-md-6 mb-4">
+                <label className="small fw-bold text-muted mb-1">Confirm Password</label>
+                <div className="input-group border rounded-pill px-3 py-1">
+                  <span className="input-group-text bg-transparent border-0"><i className="bi bi-check2-circle text-muted"></i></span>
+                  <input className="form-control border-0 shadow-none bg-transparent" type="password" placeholder="••••••••" />
+                </div>
+              </div>
+            </div>
+
+            <button type="submit" className="btn btn-primary w-100 rounded-pill py-3 fw-bold mb-3 shadow-sm" style={{ background: "#1150af", border: "none" }}>
+              CREATE ACCOUNT
+            </button>
+
+            <div className="text-center">
+              <span className="text-muted small">Already have an account? </span>
+              <button type="button" className="btn btn-link btn-sm p-0 fw-bold text-decoration-none" onClick={() => navigate("/")} style={{ color: "#1150af" }}>
+                Sign in
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
   );
 }
 
