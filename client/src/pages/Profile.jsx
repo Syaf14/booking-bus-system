@@ -53,7 +53,7 @@ function Profile() {
                     <div className="col-sm-6">
                       <label className="small text-uppercase text-muted fw-bold mb-1 d-block">Full Name</label>
                       <p className="fs-6 fw-medium text-dark border-start border-3 border-primary ps-3">
-                        Wan Mohammad Syafrul Aiman Bin Wan Mohd Sanusi
+                        Ahmad Ali Bin Abu
                       </p>
                     </div>
 
@@ -67,7 +67,7 @@ function Profile() {
                     <div className="col-sm-6">
                       <label className="small text-uppercase text-muted fw-bold mb-1 d-block">Mobile Number</label>
                       <p className="fs-6 fw-medium text-dark border-start border-3 border-info ps-3">
-                        +6017 289 2440
+                        +6012 345 6789
                       </p>
                     </div>
 

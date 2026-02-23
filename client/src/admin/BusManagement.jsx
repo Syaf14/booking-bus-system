@@ -5,14 +5,12 @@ import axios from 'axios';
 
 function BusManagement() {
     const navigate = useNavigate();
-
     const [buses, setBuses] = useState([]);
     const [busRoute, setBusRoute] = useState([]);
 
     // --- Pagination State ---
     const [busPage, setBusPage] = useState(1);
     const busPerPage = 5;
-
     const [routePage, setRoutePage] = useState(1);
     const routePerPage = 10;
 
@@ -21,7 +19,6 @@ function BusManagement() {
         fetchBusRoutes();
     }, []);
 
-    // --- Data Fetching ---
     const fetchBuses = async () => {
         try {
             const response = await axios.get("http://localhost:5000/api/busManagement/all-buses");
@@ -36,7 +33,6 @@ function BusManagement() {
         } catch (err) { console.error(err); }
     };
 
-    // --- Pagination Logic ---
     const indexOfLastBus = busPage * busPerPage;
     const indexOfFirstBus = indexOfLastBus - busPerPage;
     const currentBuses = buses.slice(indexOfFirstBus, indexOfLastBus);
@@ -48,7 +44,6 @@ function BusManagement() {
     const paginateBuses = (pageNumber) => setBusPage(pageNumber);
     const paginateRoutes = (pageNumber) => setRoutePage(pageNumber);
 
-    // Helper for Delete
     const handleDelete = async (id) => {
         if (!window.confirm("Delete this bus?")) return;
         try {
@@ -58,132 +53,158 @@ function BusManagement() {
     };
 
     const handleDeleteRoute = async (id) => {
-        // Confirm with the user before deleting
         if (!window.confirm("Are you sure you want to delete this bus route?")) return;
-
         try {
-            // Calling the soft-delete endpoint we refactored earlier
             const response = await axios.delete(`http://localhost:5000/api/busManagement/delete-bus-route/${id}`);
-            
-            if (response.status === 200) {
-                alert("Route deleted successfully");
-                fetchBusRoutes(); // Refresh the routes table to show updated data
-            }
-        } catch (err) {
-            console.error("Failed to delete route:", err);
-            alert("Error deleting route. Please try again.");
-        }
+            if (response.status === 200) { fetchBusRoutes(); }
+        } catch (err) { console.error("Failed to delete route:", err); }
     };
 
     return (
       <AdminLayout>
-        <div className='bg-white border-bottom border-3 mb-2' style={{ height: "20vh", width: "100%" }}>
-            <div className='px-5 d-flex align-items-center h-100 w-100'>
-                <h1 className='fw-bold'>Bus Management</h1>
-            </div>
-        </div>
-        <div className='card p-0 mb-4'>
-          <div className='card-header p-0'>
-            <div className='d-flex justify-content-end py-3 px-3'>
-                <button className='btn btn-success mx-3' onClick={() => navigate('/add-bus')}>+ADD BUS</button>
-            </div>
-          </div>
-          <div className='card-body pb-0'>
-            {/* --- BUS TABLE --- */}
-            <div className='mb-4 px-3'>
-                <div className='mb-2'>
-                  <h5 className='fst-italic'>Buses (Page {busPage})</h5>
+        <div className="container-fluid py-4" style={{ backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
+            
+            {/* Header Section */}
+            <div className="d-flex justify-content-between align-items-end mb-4 px-3">
+                <div>
+                    <h2 className="fw-bold text-dark mb-1">Bus Management</h2>
+                    <p className="text-muted small mb-0">Monitor and organize your transport network</p>
                 </div>
-                <table className='table table-bordered bg-white'>
-                    <thead>
-                        <tr className='text-center'>
-                            <th>NO</th>
-                            <th>BUS CODE</th>
-                            <th>BUS NAME</th>
-                            <th>CAPACITY</th>
-                            <th>STATUS</th>
-                            <th>ACTION</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {currentBuses.map((bus, index) => (
-                            <tr key={bus.id}>
-                                <td>{indexOfFirstBus + index + 1}</td>
-                                <td>{bus.bus_code}</td>
-                                <td>{bus.bus_name}</td>
-                                <td>S:{bus.capacity_seat} / ST:{bus.capacity_standing}</td>
-                                <td className='text-center'>
-                                    <span className={`badge ${bus.deleted_at ? 'bg-danger' : 'bg-success'}`}>
-                                        {bus.deleted_at ? 'INACTIVE' : 'ACTIVE'}
-                                    </span>
-                                </td>
-                                <td className='text-center'>
-                                    <button className='btn btn-sm btn-secondary me-2' onClick={() => navigate(`/admin-edit-bus-management/${bus.id}`)}>EDIT</button>
-                                    <button className='btn btn-sm btn-danger' onClick={() => handleDelete(bus.id)}>DELETE</button>
-                                </td>
+                <div className="d-flex gap-2">
+                    <button className="btn btn-primary px-4 shadow-sm fw-bold" onClick={() => navigate('/add-bus')}>
+                        <i className="bi bi-plus-lg me-2"></i>New Bus
+                    </button>
+                    <button className="btn btn-dark px-4 shadow-sm fw-bold" onClick={() => navigate('/add-bus-route')}>
+                        <i className="bi bi-map me-2"></i>New Route
+                    </button>
+                </div>
+            </div>
+
+            {/* Quick Stats Summary */}
+            <div className="row px-3 mb-4">
+                <div className="col-md-3">
+                    <div className="card border-0 shadow-sm p-3 bg-white text-center rounded-4">
+                        <span className="text-muted small text-uppercase fw-bold">Total Bus</span>
+                        <h3 className="fw-bold text-primary mb-0">{buses.length}</h3>
+                    </div>
+                </div>
+                <div className="col-md-3">
+                    <div className="card border-0 shadow-sm p-3 bg-white text-center rounded-4">
+                        <span className="text-muted small text-uppercase fw-bold">Active Routes</span>
+                        <h3 className="fw-bold text-success mb-0">{busRoute.length}</h3>
+                    </div>
+                </div>
+            </div>
+
+            {/* --- FLEET TABLE --- */}
+            <div className="card border-0 shadow-sm mx-3 mb-5 rounded-4 overflow-hidden">
+                <div className="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
+                    <h5 className="mb-0 fw-bold">Bus Details <span className="badge bg-light text-dark ms-2 fw-normal">Page {busPage}</span></h5>
+                </div>
+                <div className="table-responsive">
+                    <table className="table table-bordered align-middle mb-0">
+                        <thead className="bg-light">
+                            <tr className="text-muted small">
+                                <th className="ps-4">No</th>
+                                <th>Code</th>
+                                <th>Vehicle Name</th>
+                                <th>Capacity Details</th>
+                                <th className="text-center">Operational Status</th>
+                                <th className="text-end pe-4">Actions</th>
                             </tr>
+                        </thead>
+                        <tbody className="bg-white">
+                            {currentBuses.map((bus, index) => (
+                                <tr key={bus.id} style={{ borderBottom: '1px solid #f1f1f1' }}>
+                                    <td className="ps-4 text-muted">{indexOfFirstBus + index + 1}</td>
+                                    <td><code className="text-primary fw-bold">{bus.bus_code}</code></td>
+                                    <td className="fw-bold text-dark">{bus.bus_name}</td>
+                                    <td>
+                                        <div className="d-flex gap-2">
+                                            <span className="badge bg-soft-blue text-primary border">💺 {bus.capacity_seat}</span>
+                                            <span className="badge bg-soft-gray text-muted border">🧍 {bus.capacity_standing}</span>
+                                        </div>
+                                    </td>
+                                    <td className="text-center">
+                                        <span className={`px-3 py-1 rounded-pill small fw-bold ${bus.deleted_at ? 'bg-danger-subtle text-danger' : 'bg-success-subtle text-success'}`}>
+                                            {bus.deleted_at ? 'Inactive' : 'Active'}
+                                        </span>
+                                    </td>
+                                    <td className="text-end pe-4">
+                                        <button className="btn btn-light btn-sm me-2 rounded-3 border" onClick={() => navigate(`/admin-edit-bus-management/${bus.id}`)}>
+                                            <i className="bi bi-pencil"></i>
+                                        </button>
+                                        <button className="btn btn-outline-danger btn-sm rounded-3" onClick={() => handleDelete(bus.id)}>
+                                            <i className="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+                <div className="card-footer bg-white border-0 py-3">
+                    <div className="d-flex justify-content-center gap-1">
+                        {[...Array(Math.ceil(buses.length / busPerPage))].map((_, i) => (
+                            <button key={i} onClick={() => paginateBuses(i + 1)} className={`btn btn-sm rounded-circle ${busPage === i + 1 ? 'btn-primary px-3' : 'btn-light border text-muted'}`}>
+                                {i + 1}
+                            </button>
                         ))}
-                    </tbody>
-                </table>
-                {/* Bus Pagination Buttons */}
-                <div className='d-flex justify-content-center'>
-                    {[...Array(Math.ceil(buses.length / busPerPage))].map((_, i) => (
-                        <button key={i} onClick={() => paginateBuses(i + 1)} className={`btn btn-sm mx-1 ${busPage === i + 1 ? 'btn-primary' : 'btn-outline-primary'}`}>
-                            {i + 1}
-                        </button>
-                    ))}
+                    </div>
                 </div>
             </div>
-          </div>
-        </div>
-        <div className='card'>
-          <div className='card-header p-0'>
-            <div className='d-flex justify-content-end py-3 px-3'>
-                <button className='btn btn-success' onClick={() => navigate('/add-bus-route')}>+ADD BUS ROUTE</button>
+
+            {/* --- ROUTES TABLE --- */}
+            <div className="card border-0 shadow-sm mx-3 rounded-4 overflow-hidden">
+                <div className="card-header bg-white border-0 py-3">
+                    <h5 className="mb-0 fw-bold text-success">Active Service Routes</h5>
+                </div>
+                <div className="table-responsive">
+                    <table className="table table-bordered align-middle mb-0">
+                        <thead className="bg-light text-muted small">
+                            <tr className='text-center'>
+                                <th className="ps-4 text-start">No</th>
+                                <th>Assign Bus</th>
+                                <th>Origin Point</th>
+                                <th>Destination Point</th>
+                                <th className="text-end pe-4">Manage</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {currentRoutes.map((route, index) => (
+                                <tr key={route.id} className="text-center">
+                                    <td className="ps-4 text-start">{indexOfFirstRoute + index + 1}</td>
+                                    <td><span className="badge bg-dark rounded-1">{route.bus_code}</span></td>
+                                    <td>
+                                        <div className="fw-bold">{route.depart_location}</div>
+                                        <div className="small text-muted"><i className="bi bi-clock me-1"></i>{route.depart_time}</div>
+                                    </td>
+                                    <td>
+                                        <div className="fw-bold">{route.arrive_location}</div>
+                                        <div className="small text-muted"><i className="bi bi-clock me-1"></i>{route.arrive_time}</div>
+                                    </td>
+                                    <td className="text-end pe-4">
+                                        <button className="btn btn-sm btn-link text-danger text-decoration-none fw-bold" onClick={() => handleDeleteRoute(route.id)}>
+                                            <i className="bi bi-x-circle me-1"></i>Remove
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+                <div className="card-footer bg-white border-0 py-3 text-center">
+                    <div className="d-flex justify-content-center gap-1">
+                        {[...Array(Math.ceil(busRoute.length / routePerPage))].map((_, i) => (
+                            <button key={i} onClick={() => paginateRoutes(i + 1)} className={`btn btn-sm rounded-circle ${routePage === i + 1 ? 'btn-success px-3 text-white' : 'btn-light border'}`}>
+                                {i + 1}
+                            </button>
+                        ))}
+                    </div>
+                </div>
             </div>
-          </div>
-          <div className='card-body pb-0'>
-                    {/* --- ROUTE TABLE --- */}
-          <div className='mb-5 px-3'>
-              <div className='mb-2'>
-                <h5 className='fst-italic'>Routes (Page {routePage})</h5>
-              </div>
-              <table className='table table-bordered bg-white'>
-                  <thead>
-                      <tr className='text-center'>
-                          <th>NO</th>
-                          <th>BUS CODE</th>
-                          <th>DEPART</th>
-                          <th>ARRIVE</th>
-                          <th>ACTION</th>
-                      </tr>
-                  </thead>
-                  <tbody>
-                      {currentRoutes.map((route, index) => (
-                          <tr key={route.id} className='text-center'>
-                              <td>{indexOfFirstRoute + index + 1}</td>
-                              <td>{route.bus_code}</td>
-                              <td>{route.depart_location} ({route.depart_time})</td>
-                              <td>{route.arrive_location} ({route.arrive_time})</td>
-                              <td>
-                                  <button className='btn btn-sm btn-danger' onClick={() => handleDeleteRoute(route.id)}>DELETE</button>
-                              </td>
-                          </tr>
-                      ))}
-                  </tbody>
-              </table>
-              {/* Route Pagination Buttons */}
-              <div className='d-flex justify-content-center'>
-                  {[...Array(Math.ceil(busRoute.length / routePerPage))].map((_, i) => (
-                      <button key={i} onClick={() => paginateRoutes(i + 1)} className={`btn btn-sm mx-1 ${routePage === i + 1 ? 'btn-primary' : 'btn-outline-primary'}`}>
-                          {i + 1}
-                      </button>
-                  ))}
-              </div>
-          </div>
-          </div>
-        </div>              
+        </div>
       </AdminLayout>
     );
-  }
+}
 export default BusManagement;

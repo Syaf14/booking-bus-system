@@ -36,7 +36,7 @@ const UserLayout = ({ children }) => {
             <div 
               className="px-4 py-2 text-white d-flex flex-column align-items-center user-nav-link" 
               style={{ cursor: "pointer", transition: "0.3s" }}
-              onClick={() => navigate("/my-tickets")} 
+              onClick={() => navigate("/ticket")} 
             >
               <i className="bi bi-ticket-perforated fs-5"></i>
               <span className="small fw-bold">My Ticket</span>
