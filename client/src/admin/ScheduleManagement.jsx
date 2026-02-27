@@ -6,6 +6,10 @@ import AdminLayout from '../global/AdminLayout';
 function ScheduleManagement() {
     const navigate = useNavigate();
     const [schedule, setSchedule] = useState([]);
+    
+    // --- Pagination State ---
+    const [currentPage, setCurrentPage] = useState(1);
+    const recordsPerPage = 15;
 
     useEffect(() => {
         fetchSchedule();
@@ -18,6 +22,33 @@ function ScheduleManagement() {
         } catch (err) {
             console.error(err);
         }
+    }
+
+    const handleDelete = async (id) => {
+        if (!window.confirm("Delete this schedule?")) return;
+        try {
+            await axios.delete(`http://localhost:5000/api/scheduleManagement/delete-schedule-bus/${id}`);
+            fetchSchedule();
+        } catch (err) { console.error(err); }
+    };
+
+    // --- Pagination Logic ---
+    const lastIndex = currentPage * recordsPerPage;
+    const firstIndex = lastIndex - recordsPerPage;
+    const currentRecords = schedule.slice(firstIndex, lastIndex);
+    const npage = Math.ceil(schedule.length / recordsPerPage);
+    const numbers = [...Array(npage + 1).keys()].slice(1);
+
+    const prePage = () => {
+        if (currentPage !== 1) setCurrentPage(currentPage - 1);
+    }
+
+    const changeCPage = (id) => {
+        setCurrentPage(id);
+    }
+
+    const nextPage = () => {
+        if (currentPage !== npage) setCurrentPage(currentPage + 1);
     }
 
     return (
@@ -54,6 +85,7 @@ function ScheduleManagement() {
                                 <tr className="text-muted small text-uppercase">
                                     <th className="ps-4" style={{ width: "80px" }}>No</th>
                                     <th>Route Path</th>
+                                    <th className="text-center">Day</th>
                                     <th className="text-center">Departure</th>
                                     <th className="text-center">Arrival</th>
                                     <th className="text-center">Status</th>
@@ -61,15 +93,19 @@ function ScheduleManagement() {
                                 </tr>
                             </thead>
                             <tbody className="bg-white">
-                                {schedule.map((item, index) => (
+                                {/* Use currentRecords instead of schedule.map */}
+                                {currentRecords.map((item, index) => (
                                     <tr key={item.id} className="hover-row">
-                                        <td className="ps-4 fw-bold text-muted">{index + 1}</td>
+                                        <td className="ps-4 fw-bold text-muted">{firstIndex + index + 1}</td>
                                         <td>
                                             <div className="d-flex align-items-center">
                                                 <span className="fw-bold text-dark">{item.depart_location}</span>
                                                 <i className="bi bi-arrow-right mx-2 text-primary"></i>
                                                 <span className="fw-bold text-dark">{item.arrive_location}</span>
                                             </div>
+                                        </td>
+                                        <td className='text-center'>
+                                            <span className='badge bg-primary text-white'>{item.day_assigned}</span>
                                         </td>
                                         <td className="text-center">
                                             <span className="badge bg-light text-primary border px-3 py-2 rounded-3">
@@ -88,10 +124,10 @@ function ScheduleManagement() {
                                         </td>
                                         <td className="text-end pe-4">
                                             <div className="btn-group shadow-sm rounded-3 overflow-hidden">
-                                                <button className="btn btn-white btn-sm border-end px-3 hover-primary" title="View Details">
+                                                <button className="btn btn-white btn-sm border-end px-3" title="View Details">
                                                     <i className="bi bi-eye text-primary"></i>
                                                 </button>
-                                                <button className="btn btn-white btn-sm px-3 hover-danger" title="Delete Schedule">
+                                                <button className="btn btn-white btn-sm px-3" title="Delete Schedule" onClick={() => handleDelete(item.id)}>
                                                     <i className="bi bi-trash3 text-danger"></i>
                                                 </button>
                                             </div>
@@ -101,7 +137,7 @@ function ScheduleManagement() {
 
                                 {schedule.length === 0 && (
                                     <tr>
-                                        <td colSpan="6" className="py-5 text-center">
+                                        <td colSpan="7" className="py-5 text-center">
                                             <div className="text-muted">
                                                 <i className="bi bi-calendar-x display-4"></i>
                                                 <p className="mt-2">No schedules found in the database.</p>
@@ -113,8 +149,26 @@ function ScheduleManagement() {
                         </table>
                     </div>
                     
-                    <div className="card-footer bg-white border-0 py-3 text-end">
-                        <small className="text-muted">Showing {schedule.length} total entries</small>
+                    {/* Pagination Footer */}
+                    <div className="card-footer bg-white border-0 py-3 d-flex justify-content-between align-items-center">
+                        <small className="text-muted">
+                            Showing {firstIndex + 1} to {Math.min(lastIndex, schedule.length)} of {schedule.length} entries
+                        </small>
+                        <nav>
+                            <ul className="pagination pagination-sm mb-0">
+                                <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                                    <button className="page-link" onClick={prePage}>Previous</button>
+                                </li>
+                                {numbers.map((n, i) => (
+                                    <li className={`page-item ${currentPage === n ? 'active' : ''}`} key={i}>
+                                        <button className="page-link" onClick={() => changeCPage(n)}>{n}</button>
+                                    </li>
+                                ))}
+                                <li className={`page-item ${currentPage === npage ? 'disabled' : ''}`}>
+                                    <button className="page-link" onClick={nextPage}>Next</button>
+                                </li>
+                            </ul>
+                        </nav>
                     </div>
                 </div>
             </div>

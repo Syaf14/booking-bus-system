@@ -1,18 +1,20 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom"; // Added useLocation
 
 const AdminLayout = ({ children }) => {
   const navigate = useNavigate();
+  const location = useLocation(); // Hook to get current URL path
 
-  // Internal styles for a cleaner look
-  const sidebarItemStyle = {
+  const sidebarItemStyle = (isActive) => ({
     cursor: "pointer",
     transition: "all 0.3s ease",
     borderRadius: "0",
-    borderLeft: "4px solid transparent",
-    color: "#cbd5e0",
+    // Stay active logic:
+    borderLeft: isActive ? "4px solid #00d1ff" : "4px solid transparent",
+    backgroundColor: isActive ? "rgba(255,255,255,0.15)" : "transparent",
+    color: isActive ? "#fff" : "#cbd5e0",
     fontSize: "0.9rem",
-    fontWeight: "500"
-  };
+    fontWeight: isActive ? "700" : "500",
+  });
 
   return (
     <div className="container-fluid p-0">
@@ -52,27 +54,34 @@ const AdminLayout = ({ children }) => {
               { label: "MANAGE BOOKING", icon: "bi-journal-bookmark-fill", path: "/admin-booking-management" },
               { label: "USER MANAGEMENT", icon: "bi-people-fill", path: "/admin-user-management" },
               { label: "REPORTS & NOTIFS", icon: "bi-card-text", path: "/admin-report-notification-management" },
-            ].map((item, index) => (
-              <div
-                key={index}
-                className="py-3 px-4 sidebar-link"
-                style={sidebarItemStyle}
-                onClick={() => navigate(item.path)}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = "rgba(255,255,255,0.1)";
-                  e.currentTarget.style.color = "#fff";
-                  e.currentTarget.style.borderLeftColor = "#00d1ff";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = "transparent";
-                  e.currentTarget.style.color = "#cbd5e0";
-                  e.currentTarget.style.borderLeftColor = "transparent";
-                }}
-              >
-                <i className={`bi ${item.icon} me-3 fs-5`}></i>
-                {item.label}
-              </div>
-            ))}
+            ].map((item, index) => {
+              // Check if this item is the current page
+              const isActive = location.pathname === item.path;
+
+              return (
+                <div
+                  key={index}
+                  className="py-3 px-4 sidebar-link"
+                  style={sidebarItemStyle(isActive)}
+                  onClick={() => navigate(item.path)}
+                  onMouseEnter={(e) => {
+                    if (!isActive) {
+                      e.currentTarget.style.backgroundColor = "rgba(255,255,255,0.05)";
+                      e.currentTarget.style.color = "#fff";
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isActive) {
+                      e.currentTarget.style.backgroundColor = "transparent";
+                      e.currentTarget.style.color = "#cbd5e0";
+                    }
+                  }}
+                >
+                  <i className={`bi ${item.icon} me-3 fs-5 ${isActive ? 'text-info' : ''}`}></i>
+                  {item.label}
+                </div>
+              );
+            })}
           </div>
 
           {/* Sidebar Footer */}
@@ -89,9 +98,11 @@ const AdminLayout = ({ children }) => {
 
         {/* MAIN CONTENT AREA */}
         <div className="col-md-9 col-lg-10 bg-light">
-          {/* Top Bar for spacing/context */}
           <nav className="navbar navbar-expand navbar-light bg-white border-bottom px-4 shadow-sm" style={{ height: "60px" }}>
-            <span className="navbar-brand mb-0 h6 text-muted">Management Dashboard</span>
+            <span className="navbar-brand mb-0 h6 text-muted">
+                {/* Dynamically show page name in top bar */}
+                {location.pathname.replace('/admin-', '').replace('-', ' ').toUpperCase()}
+            </span>
           </nav>
 
           <main className="p-4" style={{ minHeight: "calc(100vh - 60px)" }}>
@@ -101,12 +112,6 @@ const AdminLayout = ({ children }) => {
           </main>
         </div>
       </div>
-
-      <style>{`
-        .sidebar-link:active {
-          background-color: rgba(255,255,255,0.2) !important;
-        }
-      `}</style>
     </div>
   );
 };

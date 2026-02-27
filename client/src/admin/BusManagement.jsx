@@ -10,7 +10,7 @@ function BusManagement() {
 
     // --- Pagination State ---
     const [busPage, setBusPage] = useState(1);
-    const busPerPage = 5;
+    const busPerPage = 10;
     const [routePage, setRoutePage] = useState(1);
     const routePerPage = 10;
 
@@ -109,6 +109,7 @@ function BusManagement() {
                                 <th>Code</th>
                                 <th>Vehicle Name</th>
                                 <th>Capacity Details</th>
+                                <th>Plate No</th>
                                 <th className="text-center">Operational Status</th>
                                 <th className="text-end pe-4">Actions</th>
                             </tr>
@@ -125,16 +126,19 @@ function BusManagement() {
                                             <span className="badge bg-soft-gray text-muted border">🧍 {bus.capacity_standing}</span>
                                         </div>
                                     </td>
+                                    <td>
+                                        <code className="text-primary fw-bold">{bus.plate_no}</code>
+                                    </td>
                                     <td className="text-center">
                                         <span className={`px-3 py-1 rounded-pill small fw-bold ${bus.deleted_at ? 'bg-danger-subtle text-danger' : 'bg-success-subtle text-success'}`}>
                                             {bus.deleted_at ? 'Inactive' : 'Active'}
                                         </span>
                                     </td>
                                     <td className="text-end pe-4">
-                                        <button className="btn btn-light btn-sm me-2 rounded-3 border" onClick={() => navigate(`/admin-edit-bus-management/${bus.id}`)}>
+                                        <button className="btn btn-light btn-sm me-2 rounded-3 border" title='Edit' onClick={() => navigate(`/admin-edit-bus-management/${bus.id}`)}>
                                             <i className="bi bi-pencil"></i>
                                         </button>
-                                        <button className="btn btn-outline-danger btn-sm rounded-3" onClick={() => handleDelete(bus.id)}>
+                                        <button className="btn btn-outline-danger btn-sm rounded-3" title='Deactivate' onClick={() => handleDelete(bus.id)}>
                                             <i className="bi bi-trash"></i>
                                         </button>
                                     </td>
@@ -167,6 +171,7 @@ function BusManagement() {
                                 <th>Assign Bus</th>
                                 <th>Origin Point</th>
                                 <th>Destination Point</th>
+                                <th>Day Assigned</th>
                                 <th className="text-end pe-4">Manage</th>
                             </tr>
                         </thead>
@@ -183,7 +188,13 @@ function BusManagement() {
                                         <div className="fw-bold">{route.arrive_location}</div>
                                         <div className="small text-muted"><i className="bi bi-clock me-1"></i>{route.arrive_time}</div>
                                     </td>
+                                    <td>
+                                        <span className="badge bg-primary rounded-1 px-3 py-2">{route.day_assigned}</span>
+                                    </td>
                                     <td className="text-end pe-4">
+                                        <button className="btn btn-sm btn-link text-secondary text-decoration-none fw-bold" onClick={() => navigate(`/admin-edit-bus-route-management/${route.id}`)}>
+                                            <i className="bi bi-pencil me-1"></i>Edit
+                                        </button>
                                         <button className="btn btn-sm btn-link text-danger text-decoration-none fw-bold" onClick={() => handleDeleteRoute(route.id)}>
                                             <i className="bi bi-x-circle me-1"></i>Remove
                                         </button>

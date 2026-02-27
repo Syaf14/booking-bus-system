@@ -41,14 +41,14 @@ function UserManagement() {
 
     // Filter for Students
     const filteredStudents = users.filter(user => 
-        user.role === 'student' && (
+        user.role?.toLowerCase() === 'student' && (
         (user.full_name || user.name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
         (user.email || "").toLowerCase().includes(searchTerm.toLowerCase()))
     );
 
     // Filter for Admins
     const filteredAdmins = users.filter(user => 
-        user.role === 'admin' && (
+        user.role?.toLowerCase() === 'admin' && (
         (user.name || "").toLowerCase().includes(adminSearchTerm.toLowerCase()) ||
         (user.email || "").toLowerCase().includes(adminSearchTerm.toLowerCase()))
     );

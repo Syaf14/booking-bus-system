@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 
 exports.register = async (req, res) => {
     try {
-        const { name, email, password } = req.body;
+        const { name, email, password, role } = req.body;
         
         // Use destructuring [rows] to get the result
         const [existingUsers] = await db.query("SELECT * FROM users WHERE email = ?", [email]);
@@ -15,8 +15,8 @@ exports.register = async (req, res) => {
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        await db.query("INSERT INTO users (name, email, password) VALUES (?, ?, ?)", 
-            [name, email, hashedPassword]
+        await db.query("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)", 
+            [name, email, hashedPassword, role]
         );
 
         res.json({ message: "User registered successfully" });

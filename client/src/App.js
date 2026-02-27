@@ -20,6 +20,7 @@ import AddScheduleManagement from './admin/schedule_management/AddScheduleManage
 import Profile from './pages/Profile';
 import Ticket from './pages/Ticket';
 import SeatBook from './booking/SeatBook';
+import EditBusRoute from './admin/bus_management/EditBusRoute';
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
 
         <Route path="/admin-dashboard" element={<AdminDashboard />} />
         <Route path="/admin-bus-management" element={<BusManagement />}/>
+        <Route path="/admin-edit-bus-route-management/:id" element={<EditBusRoute />}/>
         <Route path="/admin-edit-bus-management/:id" element={<EditBus />} />
         <Route path="/admin-schedule-management" element={<ScheduleManagement />}/>
         <Route path="/admin-booking-management" element={<BookingManagement />}/>

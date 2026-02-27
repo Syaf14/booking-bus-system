@@ -5,8 +5,18 @@ exports.getAllUsers = async (req, res) => {
     try {
         const query = `
             SELECT 
-                u.id, u.name, u.email, u.role, u.created_at,
-                p.full_name, p.phone_no, p.gender, p.college_name, p.student_id
+                u.id, 
+                u.name, 
+                u.email, 
+                u.role, 
+                u.created_at,
+                p.full_name, 
+                p.phone_no, 
+                p.gender, 
+                p.college_name, 
+                p.student_id,
+                /* Fallback: if profile name is missing, use account name */
+                COALESCE(p.full_name, u.name) AS display_name
             FROM users u
             LEFT JOIN profiles p ON u.id = p.user_id
             WHERE u.role IN ('student', 'admin') 

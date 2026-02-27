@@ -36,3 +36,23 @@
     transform: rotate(360deg);
   }
 }
+
+/* Default state (unselected) */
+.btn-role-toggle {
+  color: #6c757d; /* Muted text */
+  background-color: transparent;
+  transition: all 0.3s ease;
+  font-size: 0.85rem;
+}
+
+/* Selected state (When radio is checked) */
+.btn-check:checked + .btn-role-toggle {
+  background-color: #1150af !important; /* Your brand blue background */
+  color: white !important;               /* White text for contrast */
+  box-shadow: 0 2px 5px rgba(17, 80, 175, 0.3);
+}
+
+/* Hover effect for the one not selected */
+.btn-role-toggle:hover:not(.btn-check:checked + .btn-role-toggle) {
+  background-color: #e9ecef;
+}

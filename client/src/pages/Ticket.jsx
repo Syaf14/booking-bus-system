@@ -1,5 +1,5 @@
 import React from 'react'
-import Layout from '../global/Layout'
+import UserLayout from '../global/UserLayout';
 
 function Ticket() {
   // Hardcoded ticket data
@@ -29,7 +29,7 @@ function Ticket() {
   ];
 
   return (
-    <Layout>
+    <UserLayout>
       <div className="container py-4">
         <div className="mb-4">
           <h4 className="fw-bold text-dark mb-1">My Bookings</h4>
@@ -98,7 +98,7 @@ function Ticket() {
           </div>
         )}
       </div>
-    </Layout>
+    </UserLayout>
   )
 }
 

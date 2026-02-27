@@ -69,7 +69,7 @@ function AddBusRoute() {
 
                                 <form onSubmit={handleSubmit}>
                                     {/* Bus Selection Row */}
-                                    <div className="mb-5 pb-4 border-bottom">
+                                    <div className="mb-3 pb-4 border-bottom">
                                         <label className="form-label fw-bold small text-muted text-uppercase mb-3">Vehicle Assignment</label>
                                         <div className="input-group input-group-lg">
                                             <span className="input-group-text bg-light"><i className="bi bi-bus-front text-primary"></i></span>
@@ -85,6 +85,26 @@ function AddBusRoute() {
                                                         {bus.bus_code} | {bus.bus_name}
                                                     </option>
                                                 ))}
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div className="mb-4">
+                                        <label className="form-label small text-muted">Day of assign</label>
+                                        <div className="input-group input-group-lg">
+                                            <span className="input-group-text bg-light"><i class="bi bi-calendar2-day text-primary"></i></span>
+                                            <select 
+                                                name="day_assigned" 
+                                                onChange={handleChange} 
+                                                className="form-select bg-light fw-bold"
+                                                required
+                                            >
+                                                <option value="" disabled selected>-- Click to select day --</option>
+                                                <option value="isnin">Isnin</option>
+                                                <option value="selasa">Selasa</option>
+                                                <option value="rabu">Rabu</option>
+                                                <option value="khamis">Khamis</option>
+                                                <option value="jumaat">Jumaat</option>
                                             </select>
                                         </div>
                                     </div>

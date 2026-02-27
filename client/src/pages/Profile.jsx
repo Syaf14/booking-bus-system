@@ -1,12 +1,12 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import Layout from '../global/Layout';
+import UserLayout from '../global/UserLayout';
 
 function Profile() {
   const navigate = useNavigate();
 
   return (
-    <Layout>
+    <UserLayout>
       <div className="container py-4">
         <div className="row justify-content-center">
           <div className="col-md-10 col-lg-7">
@@ -108,7 +108,7 @@ function Profile() {
         .border-primary { border-color: #35557E !important; }
         .border-info { border-color: #24afe6 !important; }
       `}</style>
-    </Layout>
+    </UserLayout>
   );
 }
 

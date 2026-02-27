@@ -1,6 +1,7 @@
 import { useState } from "react";
 import API from "../services/api";
 import { useNavigate } from "react-router-dom";
+import '../App.css';
 
 function Register() {
   const navigate = useNavigate();
@@ -48,7 +49,49 @@ function Register() {
         {/* Form Section */}
         <div className="card-body p-4 p-md-5 bg-white">
           <form onSubmit={handleSubmit}>
-            
+            <div className="mb-4">
+              <label className="small fw-bold text-muted mb-2 d-block">Your Role</label>
+              <div className="d-flex p-1 bg-light rounded-pill border" style={{ position: 'relative' }}>
+                
+                {/* Student Option */}
+                <div className="flex-fill">
+                  <input 
+                    type="radio" 
+                    className="btn-check" 
+                    name="role" 
+                    id="roleStudent" 
+                    value="student" 
+                    onChange={handleChange} 
+                    defaultChecked 
+                  />
+                  <label 
+                    className="btn btn-role-toggle w-100 rounded-pill border-0 py-2 fw-bold" 
+                    htmlFor="roleStudent"
+                  >
+                    Student
+                  </label>
+                </div>
+
+                {/* Class Rep Option */}
+                <div className="flex-fill">
+                  <input 
+                    type="radio" 
+                    className="btn-check" 
+                    name="role" 
+                    id="roleClassRep" 
+                    value="class rep" 
+                    onChange={handleChange} 
+                  />
+                  <label 
+                    className="btn btn-role-toggle w-100 rounded-pill border-0 py-2 fw-bold" 
+                    htmlFor="roleClassRep"
+                  >
+                    Class Rep
+                  </label>
+                </div>
+
+              </div>
+            </div>
             {/* Full Name */}
             <div className="mb-3">
               <label className="small fw-bold text-muted mb-1">Full Name</label>
