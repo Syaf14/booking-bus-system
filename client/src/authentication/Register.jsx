@@ -9,6 +9,8 @@ function Register() {
   const [form, setForm] = useState({
     name: "",
     email: "",
+    phone: "",
+    student_id: "",
     password: ""
   });
 
@@ -115,7 +117,7 @@ function Register() {
                 <label className="small fw-bold text-muted mb-1">Phone Number</label>
                 <div className="input-group border rounded-pill px-3 py-1">
                   <span className="input-group-text bg-transparent border-0"><i className="bi bi-phone text-muted"></i></span>
-                  <input className="form-control border-0 shadow-none bg-transparent" placeholder="012-3456789" />
+                  <input className="form-control border-0 shadow-none bg-transparent" name="phone" onChange={handleChange} placeholder="012-3456789" />
                 </div>
               </div>
             </div>
@@ -125,7 +127,7 @@ function Register() {
               <label className="small fw-bold text-muted mb-1">Student ID</label>
               <div className="input-group border rounded-pill px-3 py-1">
                 <span className="input-group-text bg-transparent border-0"><i className="bi bi-card-text text-muted"></i></span>
-                <input className="form-control border-0 shadow-none bg-transparent" placeholder="SW0101xxx" />
+                <input className="form-control border-0 shadow-none bg-transparent" name="student_id" onChange={handleChange} placeholder="SW0101xxx" />
               </div>
             </div>
 

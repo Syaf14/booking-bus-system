@@ -8,7 +8,8 @@ exports.getAllBooking = async (req, res) => {
             u.email,
             buses.bus_code, 
             bs.seat_number,
-            bs.seat_type 
+            bs.seat_type,
+            br.day_assigned
             FROM bookings b
             LEFT JOIN users u ON u.id = b.user_id
             LEFT JOIN scheduled_bus sb ON sb.id = b.scheduled_id

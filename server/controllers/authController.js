@@ -3,11 +3,11 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 exports.register = async (req, res) => {
+    const connection = await db.getConnection();
     try {
-        const { name, email, password, role } = req.body;
+        const { name, email, phone, student_id, password, role } = req.body;
         
-        // Use destructuring [rows] to get the result
-        const [existingUsers] = await db.query("SELECT * FROM users WHERE email = ?", [email]);
+        const [existingUsers] = await connection.query("SELECT * FROM users WHERE email = ?", [email]);
 
         if (existingUsers.length > 0) {
             return res.status(400).json({ message: "Email already exists" });
@@ -15,9 +15,20 @@ exports.register = async (req, res) => {
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        await db.query("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)", 
+        await connection.beginTransaction();
+
+        const [insertUser] = await connection.query("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)", 
             [name, email, hashedPassword, role]
         );
+
+        const newUserId = insertUser.insertId;
+
+        await connection.query(
+            "INSERT INTO profiles (user_id, full_name, phone_no, student_id) VALUES (?, ?, ?, ?)",
+            [newUserId, name, phone, student_id]
+        );
+
+        await connection.commit();
 
         res.json({ message: "User registered successfully" });
     } catch (err) {

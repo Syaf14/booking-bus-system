@@ -14,12 +14,18 @@ function BookingManagement() {
 
     const fetchBooking = async () => {
         try {
+            // Ensure your backend query joins with the schedule table to get day_assigned
             const response = await axios.get("http://localhost:5000/api/bookingManagement/get-booking-management");
             setBooking(response.data);
         } catch (err) {
             console.error(err);
         }
-    };
+    }
+
+    // Filter logic for the search bar
+    const filteredBookings = booking.filter(book => 
+        book.email.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     return (
         <AdminLayout>
@@ -32,7 +38,6 @@ function BookingManagement() {
                         <p className="text-muted small mb-0">Track student reservations and seat allocations</p>
                     </div>
                     
-                    {/* Modern Search Bar */}
                     <div className="d-flex shadow-sm rounded-3 overflow-hidden" style={{ width: '350px' }}>
                         <input 
                             type="text" 
@@ -47,7 +52,6 @@ function BookingManagement() {
                     </div>
                 </div>
 
-                {/* Booking Table Card */}
                 <div className="card border-0 shadow-sm mx-3 rounded-4 overflow-hidden">
                     <div className="card-header bg-white border-0 py-3">
                         <div className="d-flex align-items-center">
@@ -59,21 +63,22 @@ function BookingManagement() {
                     </div>
 
                     <div className="table-responsive">
-                        <table className="table table-bordered align-middle mb-0">
+                        <table className="table table-hover align-middle mb-0">
                             <thead className="bg-light">
                                 <tr className="text-muted small text-uppercase">
                                     <th className="ps-4" style={{ width: "80px" }}>No</th>
                                     <th>Student Details</th>
+                                    <th className="text-center">Day</th> {/* Added Column Header */}
                                     <th className="text-center">Bus Assigned</th>
                                     <th className="text-center">Seat Info</th>
                                     <th className="text-end pe-4">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody className="bg-white text-center">
-                                {booking.map((book, index) => (
-                                    <tr key={book.id || index} className="hover-row">
-                                        <td className="ps-4 text-start fw-bold text-muted">{index + 1}</td>
-                                        <td className="text-start">
+                            <tbody className="bg-white">
+                                {filteredBookings.map((book, index) => (
+                                    <tr key={book.id || index}>
+                                        <td className="ps-4 fw-bold text-muted">{index + 1}</td>
+                                        <td>
                                             <div className="d-flex align-items-center">
                                                 <div className="rounded-circle bg-light d-flex align-items-center justify-content-center me-2" style={{ width: '32px', height: '32px' }}>
                                                     <i className="bi bi-person text-secondary"></i>
@@ -81,15 +86,21 @@ function BookingManagement() {
                                                 <span className="fw-semibold">{book.email}</span>
                                             </div>
                                         </td>
-                                        <td>
+                                        {/* Day Assigned Column */}
+                                        <td className="text-center">
+                                            <span className="text-capitalize badge bg-info bg-opacity-10 text-info border border-info border-opacity-25 px-3 py-2">
+                                                {book.day_assigned || 'N/A'}
+                                            </span>
+                                        </td>
+                                        <td className="text-center">
                                             <span className="badge bg-dark rounded-1 px-3 py-2">
                                                 <i className="bi bi-bus-front me-1"></i> {book.bus_code}
                                             </span>
                                         </td>
-                                        <td>
-                                            <div className="d-flex flex-column align-items-center">
+                                        <td className="text-center">
+                                            <div className="d-flex flex-column">
                                                 <span className="fw-bold">No. {book.seat_number}</span>
-                                                <span className={`small text-uppercase fw-bold ${book.seat_type === 'standing' ? 'text-orange' : 'text-primary'}`} style={{fontSize: '0.7rem'}}>
+                                                <span className={`small text-uppercase fw-bold ${book.seat_type === 'standing' ? 'text-warning' : 'text-primary'}`} style={{fontSize: '0.7rem'}}>
                                                     {book.seat_type}
                                                 </span>
                                             </div>
@@ -110,9 +121,9 @@ function BookingManagement() {
                                     </tr>
                                 ))}
                                 
-                                {booking.length === 0 && (
+                                {filteredBookings.length === 0 && (
                                     <tr>
-                                        <td colSpan="5" className="py-5 text-muted">
+                                        <td colSpan="6" className="py-5 text-center text-muted">
                                             <i className="bi bi-inbox display-6"></i>
                                             <p className="mt-2">No active bookings found.</p>
                                         </td>
@@ -120,13 +131,6 @@ function BookingManagement() {
                                 )}
                             </tbody>
                         </table>
-                    </div>
-
-                    <div className="card-footer bg-white border-0 py-3">
-                        <div className="d-flex justify-content-between align-items-center">
-                            <small className="text-muted fst-italic ps-2">Showing all recorded bookings</small>
-                            {/* You can add simple pagination here later if needed */}
-                        </div>
                     </div>
                 </div>
             </div>
