@@ -1,13 +1,48 @@
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 const UserLayout = ({ children }) => {
   const navigate = useNavigate();
+  const [role, setRole] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [userId, setUserId] = useState(null);
+
+  // Inside your useEffect in UserLayout.js
+  useEffect(() => {
+    const fetchUserRole = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await axios.get('http://localhost:5000/api/auth/profile', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        // This sets the role directly from your 'users' table in DB
+        setRole(response.data.role);
+        setUserId(response.data.id);
+      } catch (error) {
+        console.error("Session invalid");
+        handleLogout();
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchUserRole();
+  }, []);
+  const userRole = localStorage.getItem('role');
 
   const handleLogout = () => {
     axios.post('http://localhost:5000/api/auth/logout');
     localStorage.removeItem('token');
     navigate('/');
+  };
+
+  const handleTicketNavigation = () => {
+    if (role === 'class rep') {
+      navigate(`/ticket-class-rep/${userId}`);
+    } else {
+      navigate(`/ticket/${userId}`);
+    }
   };
 
   return (
@@ -36,16 +71,18 @@ const UserLayout = ({ children }) => {
             <div 
               className="px-4 py-2 text-white d-flex flex-column align-items-center user-nav-link" 
               style={{ cursor: "pointer", transition: "0.3s" }}
-              onClick={() => navigate("/ticket")} 
+              onClick={handleTicketNavigation} 
             >
               <i className="bi bi-ticket-perforated fs-5"></i>
-              <span className="small fw-bold">My Ticket</span>
+              <span className="small fw-bold">
+                {userRole === 'class-rep' ? 'Class Tickets' : 'My Ticket'}
+              </span>
             </div>
 
             <div 
               className="px-4 py-2 text-white d-flex flex-column align-items-center user-nav-link" 
               style={{ cursor: "pointer", transition: "0.3s" }}
-              onClick={() => navigate("/profile")}
+              onClick={() => navigate(`/profile/${userId}`)}
             >
               <i className="bi bi-person-circle fs-5"></i>
               <span className="small fw-bold">Profile</span>

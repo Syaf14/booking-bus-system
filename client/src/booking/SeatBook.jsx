@@ -1,26 +1,30 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import React, { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import UserLayout from '../global/UserLayout';
 
-const SeatIcon = ({ seat, isSelected, onClick }) => {
-    // Colors based on status
-    let color = seat.active === 1 ? "#3c97b3" : "#d1d1d1"; // Active blue vs Booked light grey
-    if (isSelected) color = "#28a745"; // Selected Green
+const SeatIcon = ({ seat, isSelected, isBooked, onClick }) => {
+    // Priority: Selection (Green) > Booked (Grey) > Active (Blue) > Inactive (Lighter Grey)
+    let color = seat.active === 1 ? "#3c97b3" : "#e0e0e0"; 
+    if (isBooked) color = "#d1d1d1"; // Grey for already taken
+    if (isSelected) color = "#28a745"; // Green for current selection
+
+    const isDisabled = seat.active === 0 || isBooked;
 
     return (
         <div 
             className="text-center position-relative mb-2" 
-            onClick={onClick} 
+            onClick={isDisabled ? null : onClick} 
             style={{ 
-                cursor: seat.active === 1 ? 'pointer' : 'not-allowed',
+                cursor: isDisabled ? 'not-allowed' : 'pointer',
                 width: "50px",
-                transition: "all 0.2s ease"
+                transition: "all 0.2s ease",
+                opacity: isDisabled ? 0.6 : 1
             }}
         >
             <div style={{ fontSize: "35px", color, transform: isSelected ? "scale(1.1)" : "scale(1)" }}>
                 {seat.seat_type === "normal" ? (
-                    <i className={`bi ${isSelected ? "bi-square-fill" : "bi-square"}`}></i>
+                    <i className={`bi ${isSelected || isBooked ? "bi-square-fill" : "bi-square"}`}></i>
                 ) : (
                     <i className="bi bi-person-standing"></i>
                 )}
@@ -33,10 +37,48 @@ const SeatIcon = ({ seat, isSelected, onClick }) => {
 };
 
 function SeatBook() {
-    const { id } = useParams();
+    const { id } = useParams(); // scheduled_id from URL
+    const navigate = useNavigate();
     const [schedule, setSchedule] = useState(null); 
     const [busSeat, setBusSeat] = useState([]);
+    const [bookedSeats, setBookedSeats] = useState([]); // Array of seat IDs already taken
     const [selectedSeat, setSelectedSeat] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                setLoading(true);
+                const token = localStorage.getItem('token');
+                
+                // 1. Fetch Schedule Details
+                const schedRes = await axios.get(`http://localhost:5000/api/scheduleManagement/get-schedule-by-id/${id}`);
+                setSchedule(schedRes.data);
+
+                // 2. Fetch All Seats for the layout
+                const seatsRes = await axios.get(`http://localhost:5000/api/busManagement/get-bus-seat`);
+                
+                // 3. Fetch specifically which seats are already taken for THIS schedule
+                // Note: If you haven't built this backend route yet, it might return 404. 
+                // Catching it ensures the rest of the seats still show up.
+                try {
+                    const takenRes = await axios.get(`http://localhost:5000/api/bookingManagement/get-booked-seats/${id}`);
+                    // Force everything to a Number to ensure the .includes() matches correctly
+                    setBookedSeats(takenRes.data.map(b => Number(b.seat_id)));
+                } catch (e) {
+                    console.warn("Could not fetch taken seats, showing all as available.");
+                }
+
+                setBusSeat(seatsRes.data);
+            } catch (err) { 
+                console.error("Initialization error:", err); 
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (id) fetchData();
+    }, [id]);
 
     const groupSeats = () => {
         const rows = {};
@@ -62,42 +104,38 @@ function SeatBook() {
         return rows;
     };
 
-    useEffect(() => {
-        const fetchScheduleDetail = async () => {
-            try {
-                const response = await axios.get(`http://localhost:5000/api/scheduleManagement/get-schedule-by-id/${id}`);
-                setSchedule(response.data);           
-            } catch (err) { console.error(err); }  
-        };
-        const fetchBusSeat = async () => {
-            try {
-                const response = await axios.get(`http://localhost:5000/api/busManagement/get-bus-seat`);
-                setBusSeat(response.data);
-            } catch (err) { console.error(err); }
-        };
-        fetchScheduleDetail();
-        fetchBusSeat();
-    }, [id]);
-
     const handleSelect = (seat) => {
-        if (seat.active === 0) return;
+        // Prevent selecting if inactive or already booked
+        if (seat.active === 0 || bookedSeats.includes(seat.id)) return;
         setSelectedSeat(seat);
     };
 
     const confirmBooking = async () => {
         if (!selectedSeat) return alert("Please select a seat first!");
+        
         try {
+            const token = localStorage.getItem('token');
+            const role = localStorage.getItem('role');
             const bookingData = {
-                scheduled_id: id,      // From useParams
+                scheduled_id: id,
                 seat_id: selectedSeat.id,
-                user_id: 1,           // Replace with actual logged-in user ID
+                // user_id is NOT sent here; backend handles it via token
             };
 
-            const response = await axios.post('http://localhost:5000/api/bookingManagement/add-booking', bookingData);
+            const response = await axios.post(
+                'http://localhost:5000/api/bookingManagement/add-booking', 
+                bookingData,
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+
             if (response.status === 201) {
                 alert(`Success! Seat ${selectedSeat.seat_number} has been booked.`);
-                // Refresh the page or update state to show the seat as booked (grey)
-                window.location.reload();
+                // Use response data to navigate to the specific user's ticket page
+                if (role === 'class rep'){
+                   navigate(`/ticket-class-rep/${response.data.user_id}`); 
+                } else {
+                    navigate(`/ticket/${response.data.user_id}`);
+                }
             }
 
         } catch (err) {
@@ -106,7 +144,8 @@ function SeatBook() {
         }
     };
 
-    if (!schedule) return <div className="p-5 text-center">Loading Bus Layout...</div>;
+    if (loading || !schedule) return <div className="p-5 text-center">Loading Bus Layout...</div>;
+    
     const seatRows = groupSeats();
 
     return (
@@ -114,7 +153,7 @@ function SeatBook() {
             <div className='container py-5' style={{ marginBottom: '15vh' }}>
                 <div className="row justify-content-center">
                     
-                    {/* BUS CABIN (Vertical Style) */}
+                    {/* BUS CABIN */}
                     <div className="col-md-5">
                         <div className="bus-shell bg-white shadow-lg p-4 position-relative" 
                              style={{ 
@@ -123,55 +162,47 @@ function SeatBook() {
                                  minHeight: "700px" 
                              }}>
                             
-                            {/* Front of Bus Indicator */}
                             <div className="text-center border-bottom pb-3 mb-4">
                                 <div className="d-flex justify-content-around align-items-center">
-                                    <div className="p-2 border rounded-circle bg-light">
-                                        <i className="bi bi-shield-shaded fs-4 text-muted"></i>
-                                    </div>
+                                    <div className="p-2 border rounded-circle bg-light"><i className="bi bi-shield-shaded fs-4 text-muted"></i></div>
                                     <div className="small fw-bold text-uppercase text-muted">Front / Driver</div>
-                                    <div className="p-2 border rounded-circle">
-                                        <i className="bi bi-compass fs-4 text-dark animate-spin"></i>
-                                    </div>
+                                    <div className="p-2 border rounded-circle"><i className="bi bi-compass fs-4 text-dark animate-spin"></i></div>
                                 </div>
                             </div>
 
-                            {/* Seat Mapping */}
                             <div className="bus-cabin-interior px-2">
                                 {Object.keys(seatRows).sort().map((rowLetter) => (
                                     <div key={rowLetter} className="d-flex justify-content-between align-items-center mb-1">
-                                        {/* LEFT COLUMN */}
                                         <div className="d-flex gap-1">
                                             {seatRows[rowLetter].left.map(seat => (
                                                 <SeatIcon 
                                                     key={seat.id} 
                                                     seat={seat}
+                                                    isBooked={bookedSeats.includes(seat.id)}
                                                     isSelected={selectedSeat?.id === seat.id} 
                                                     onClick={() => handleSelect(seat)}
                                                 />
                                             ))}
                                         </div>
 
-                                        {/* AISLE / STANDING */}
                                         <div className="text-muted small border-start border-end px-3 flex-grow-1 text-center" 
-                                             style={{ height: "60px", backgroundColor: "#f8f9fa", borderStyle: "dashed !important" }}>
+                                             style={{ height: "60px", backgroundColor: "#f8f9fa" }}>
                                             {seatRows[rowLetter].standing ? (
                                                  <SeatIcon 
                                                     seat={seatRows[rowLetter].standing}
+                                                    isBooked={bookedSeats.includes(seatRows[rowLetter].standing.id)}
                                                     isSelected={selectedSeat?.id === seatRows[rowLetter].standing.id} 
                                                     onClick={() => handleSelect(seatRows[rowLetter].standing)}
                                                 />
-                                            ) : (
-                                                <div className="mt-2 opacity-25">Aisle</div>
-                                            )}
+                                            ) : <div className="mt-2 opacity-25">Aisle</div>}
                                         </div>
 
-                                        {/* RIGHT COLUMN */}
                                         <div className="d-flex gap-1">
                                             {seatRows[rowLetter].right.map(seat => (
                                                 <SeatIcon 
                                                     key={seat.id} 
                                                     seat={seat}
+                                                    isBooked={bookedSeats.includes(seat.id)}
                                                     isSelected={selectedSeat?.id === seat.id} 
                                                     onClick={() => handleSelect(seat)}
                                                 />
@@ -183,7 +214,7 @@ function SeatBook() {
                         </div>
                     </div>
 
-                    {/* INFORMATION PANEL */}
+                    {/* SIDE PANEL */}
                     <div className="col-md-4">
                         <div className="card border-0 shadow-sm p-4 sticky-top" style={{ top: "100px" }}>
                             <h4 className="fw-bold mb-4" style={{ color: "#35557E" }}>Trip Summary</h4>
@@ -197,14 +228,12 @@ function SeatBook() {
                                     </div>
                                 </div>
                             </div>
-
                             <hr />
-
                             <h6 className="fw-bold mb-3">Seat Legend</h6>
                             <div className="d-grid gap-2">
                                 <div className="d-flex align-items-center">
                                     <div style={{ width: "20px", height: "20px", background: "#3c97b3", borderRadius: "4px" }} className="me-2"></div>
-                                    <small>Available Seat</small>
+                                    <small>Available</small>
                                 </div>
                                 <div className="d-flex align-items-center">
                                     <div style={{ width: "20px", height: "20px", background: "#28a745", borderRadius: "4px" }} className="me-2"></div>
@@ -212,7 +241,7 @@ function SeatBook() {
                                 </div>
                                 <div className="d-flex align-items-center">
                                     <div style={{ width: "20px", height: "20px", background: "#d1d1d1", borderRadius: "4px" }} className="me-2"></div>
-                                    <small>Already Booked</small>
+                                    <small>Booked / Occupied</small>
                                 </div>
                             </div>
                         </div>
@@ -221,27 +250,21 @@ function SeatBook() {
                 </div>
             </div>
 
-            {/* BOTTOM BOOKING BAR */}
+            {/* BAR */}
             <div className='fixed-bottom shadow-lg' style={{ background: "#ffffff", borderTop: "4px solid #28a745", height: "12vh", zIndex: "1000" }}>
                 <div className='container h-100 d-flex align-items-center justify-content-between'>
-                    <div className="d-flex align-items-center">
-                        <div className="bg-light p-3 rounded-circle me-3">
-                            <i className="bi bi-armchair fs-3 text-success"></i>
-                        </div>
-                        <div>
-                            <p className="mb-0 text-muted small text-uppercase">You've Picked</p>
-                            <h4 className="fw-bold mb-0 text-dark">
-                                Seat {selectedSeat ? selectedSeat.seat_number : "--"}
-                            </h4>
-                        </div>
+                    <div>
+                        <p className="mb-0 text-muted small text-uppercase">You've Picked</p>
+                        <h4 className="fw-bold mb-0 text-dark">
+                            Seat {selectedSeat ? selectedSeat.seat_number : "--"}
+                        </h4>
                     </div>
-                    
                     <button 
-                        className={`btn btn-lg px-5 fw-bold rounded-pill transition-all ${selectedSeat ? 'btn-success shadow' : 'btn-secondary opacity-50'}`}
+                        className={`btn btn-lg px-5 fw-bold rounded-pill ${selectedSeat ? 'btn-success shadow' : 'btn-secondary opacity-50'}`}
                         disabled={!selectedSeat}
                         onClick={confirmBooking}
                     >
-                        {selectedSeat ? 'PROCEED TO BOOK' : 'SELECT A SEAT'}
+                        PROCEED TO BOOK
                     </button>
                 </div>
             </div>

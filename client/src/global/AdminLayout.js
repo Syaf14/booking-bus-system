@@ -53,6 +53,7 @@ const AdminLayout = ({ children }) => {
               { label: "SCHEDULE TIMETABLE", icon: "bi-calendar-week", path: "/admin-schedule-management" },
               { label: "MANAGE BOOKING", icon: "bi-journal-bookmark-fill", path: "/admin-booking-management" },
               { label: "USER MANAGEMENT", icon: "bi-people-fill", path: "/admin-user-management" },
+              { label: "STUDENT CLASS", icon: "bi-book", path: "/admin-student-classes-management" },
               { label: "REPORTS & NOTIFS", icon: "bi-card-text", path: "/admin-report-notification-management" },
             ].map((item, index) => {
               // Check if this item is the current page
@@ -101,7 +102,7 @@ const AdminLayout = ({ children }) => {
           <nav className="navbar navbar-expand navbar-light bg-white border-bottom px-4 shadow-sm" style={{ height: "60px" }}>
             <span className="navbar-brand mb-0 h6 text-muted">
                 {/* Dynamically show page name in top bar */}
-                {location.pathname.replace('/admin-', '').replace('-', ' ').toUpperCase()}
+                {location.pathname.replace('/admin-', '').replace('-', ' ').replace('-', ' ').toUpperCase()}
             </span>
           </nav>
 

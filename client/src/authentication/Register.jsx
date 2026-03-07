@@ -1,18 +1,35 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import API from "../services/api";
 import { useNavigate } from "react-router-dom";
 import '../App.css';
+import axios from "axios";
 
 function Register() {
   const navigate = useNavigate();
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [studentClass, setStudentClasses] = useState([]);
 
   const [form, setForm] = useState({
+    role: "student",
     name: "",
     email: "",
     phone: "",
     student_id: "",
+    class_id:"",
     password: ""
   });
+
+  useEffect(() => {
+      const fetchStudentClass = async () => {
+        try {
+          const response = await axios.get(`http://localhost:5000/api/userManagement/all-student-classes`);      
+          setStudentClasses(response.data);          
+        } catch (err) {
+          console.log("Failed to fetch student class:", err);
+        }
+      };
+      fetchStudentClass();
+  },[]);
 
   const handleChange = (e) => {
     setForm({
@@ -23,6 +40,10 @@ function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (form.password !== confirmPassword) {
+        alert("Passwords do not match!");
+        return;
+    }
     try {
       const res = await API.post("/auth/register", form);
       alert(res.data.message);
@@ -123,11 +144,30 @@ function Register() {
             </div>
 
             {/* Student ID */}
-            <div className="mb-3">
-              <label className="small fw-bold text-muted mb-1">Student ID</label>
-              <div className="input-group border rounded-pill px-3 py-1">
-                <span className="input-group-text bg-transparent border-0"><i className="bi bi-card-text text-muted"></i></span>
-                <input className="form-control border-0 shadow-none bg-transparent" name="student_id" onChange={handleChange} placeholder="SW0101xxx" />
+            <div className="row mb-3">
+              <div className="col-md-6">
+                <label className="small fw-bold text-muted mb-1">Student ID</label>
+                <div className="input-group border rounded-pill px-3 py-1">
+                  <span className="input-group-text bg-transparent border-0"><i className="bi bi-card-text text-muted"></i></span>
+                  <input className="form-control border-0 shadow-none bg-transparent" type="text" name="student_id" onChange={handleChange} placeholder="SW0101xxx" />
+                </div>
+              </div>
+              <div className="col-md-6">
+                <label className="small fw-bold text-muted mb-1">Class/Course</label>
+                <div className="input-group border rounded-pill px-3 py-1">
+                  <span className="input-group-text bg-transparent border-0"><i className="bi bi-card-text text-muted"></i></span>
+                  <select 
+                  name="class_id" 
+                  id="class_id" 
+                  className="form-control border-0 shadow-none bg-transparent" 
+                  onChange={handleChange}
+                  required>
+                    <option value="">-- Select Class --</option>
+                    {studentClass.map((classes) => (
+                      <option key={classes.id} value={classes.id}>{classes.name}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
             </div>
 
@@ -145,7 +185,7 @@ function Register() {
                 <label className="small fw-bold text-muted mb-1">Confirm Password</label>
                 <div className="input-group border rounded-pill px-3 py-1">
                   <span className="input-group-text bg-transparent border-0"><i className="bi bi-check2-circle text-muted"></i></span>
-                  <input className="form-control border-0 shadow-none bg-transparent" type="password" placeholder="••••••••" />
+                  <input className="form-control border-0 shadow-none bg-transparent" type="password" placeholder="••••••••" onChange={(e) => setConfirmPassword(e.target.value)}/>
                 </div>
               </div>
             </div>

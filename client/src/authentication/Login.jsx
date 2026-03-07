@@ -26,8 +26,12 @@ function Login() {
 
       if (res.data.role === "admin") {
         navigate("/admin-dashboard");
-      } else {
+      }
+      else if(res.data.role === "student") {
         navigate("/student-dashboard");
+      }
+      else{
+        navigate("/student-class-rep-dashboard");
       }
     } catch (err) {
       console.log(err.response);

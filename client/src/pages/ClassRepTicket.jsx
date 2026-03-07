@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import UserLayout from '../global/UserLayout';
-import axios from 'axios';
 import { useParams } from 'react-router-dom';
+import axios from 'axios';
 
-function Ticket() {
+function ClassRepTicket() {
   const { id } = useParams(); // This is the user ID from the URL
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -132,4 +132,4 @@ function Ticket() {
   )
 }
 
-export default Ticket
+export default ClassRepTicket;

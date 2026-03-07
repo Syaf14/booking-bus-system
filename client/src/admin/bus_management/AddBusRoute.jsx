@@ -13,6 +13,7 @@ function AddBusRoute() {
         depart_time: "",
         arrive_location: "",
         arrive_time: "",
+        day_assigned: "",
     })
 
     useEffect(() => {
@@ -32,7 +33,12 @@ function AddBusRoute() {
         e.preventDefault();
         try {
             await axios.post("http://localhost:5000/api/busManagement/add-bus-route", form);
-            setMessage({ type: "success", text: "Route successfully established!" });
+
+            const selectedBus = busId.find(bus => bus.id === parseInt(form.bus_id));
+            setMessage({ 
+                type: "success", 
+                text: `Route for ${selectedBus?.bus_code} | ${selectedBus?.bus_name} from ${form.depart_location} to ${form.arrive_location} on ${form.day_assigned} (${form.depart_time} - ${form.arrive_time}) successfully established!`
+            });
             // Optional: reset form or navigate
         } catch (error) {
             setMessage({ type: "danger", text: "Failed to create route. Please check your data." });
