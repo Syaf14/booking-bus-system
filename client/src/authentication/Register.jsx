@@ -65,6 +65,9 @@ function Register() {
         
         {/* Header Section */}
         <div className="p-4 text-center bg-white border-bottom">
+          <div className="p-0">
+            <img src="/logo_politeknik.png" alt="" style={{height: "80px",margin:0}}/>
+          </div>
           <h2 className="fw-bold mb-1" style={{ color: "#35557E" }}>Join T-Commerce</h2>
           <p className="text-muted small mb-0">Create your account to start booking bus seats</p>
         </div>

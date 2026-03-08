@@ -25,6 +25,8 @@ import ClassRepDashboard from './pages/ClassRepDashboard';
 import ClassRepTicket from './pages/ClassRepTicket';
 import EditProfile from './profile/EditProfile';
 import StudentClassesManagement from './admin/StudentClassesManagement';
+import AddAdmin from './admin/user_management/AddAdmin';
+import DetailStudentClass from './admin/student_class_management/DetailStudentClass';
 
 function App() {
   return (
@@ -45,6 +47,8 @@ function App() {
         <Route path="/add-bus" element={<AddBus />}/>
         <Route path="/add-bus-route" element={<AddBusRoute />} />
         <Route path="/add-schedule-bus" element={<AddScheduleManagement />}/>
+        <Route path="/add-admin" element={<AddAdmin />}/>
+        <Route path="/detail-student-classes" element={<DetailStudentClass />} />
 
         <Route path="/student-dashboard" element={<Dashboard />} />
         <Route path="/student-class-rep-dashboard" element={<ClassRepDashboard />} />  

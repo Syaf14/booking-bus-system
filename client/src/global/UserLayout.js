@@ -55,6 +55,9 @@ const UserLayout = ({ children }) => {
           <div className="d-flex align-items-center" style={{cursor: 'pointer'}} onClick={() => navigate("/student-dashboard")}>
             <i className="bi bi-bus-front-fill text-white fs-2 me-2"></i>
             <h2 className="text-white mb-0 fw-bold fst-italic" style={{ letterSpacing: "1px" }}>T-Commerce</h2>
+            <div className="ms-3">
+              <img src="/logo_politeknik.png" alt="" style={{height: "80px"}}/>
+            </div>
           </div>
 
           {/* Navigation Links */}

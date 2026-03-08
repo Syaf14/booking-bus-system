@@ -1,11 +1,44 @@
 import axios from 'axios';
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import AdminLayout from '../global/AdminLayout';
 
 function AdminDashboard() {
   const navigate = useNavigate();
+  const [users, setUsers] = useState([]);
+  const [activeBus, setActiveBus] = useState([]);
+  const [booking, setBooking] =useState([]);
 
+  useEffect(() => {
+    fetchUsers();
+    fetchActiveBus();
+    fetchBooking();
+  },[])
+
+  const fetchUsers = async() => {
+    try {
+      const res = await axios.get(`http://localhost:5000/api/userManagement/get-all-user`);
+      setUsers(res.data)
+    } catch (err) {
+      console.log("Error fetch User: ", err)
+    }
+  }
+  const fetchActiveBus = async() => {
+    try {
+      const response = await axios.get(`http://localhost:5000/api/bookingManagement/get-booking-management`);
+      setBooking(response.data)
+    } catch (err) {
+      console.log("Error fetch Booking: ", err)
+    }
+  }
+  const fetchBooking = async() => {
+    try {
+      const res = await axios.get(`http://localhost:5000/api/busManagement/all-buses`);
+      setActiveBus(res.data)
+    } catch (err) {
+      console.log("Error fetch Bus: ", err)
+    }
+  }
   const handleLogout = () => {
     axios.post('http://localhost:5000/api/auth/logout') 
     localStorage.removeItem('token'); 
@@ -41,7 +74,7 @@ function AdminDashboard() {
                   <span className="text-success small fw-bold">+12% <i className="bi bi-arrow-up"></i></span>
                 </div>
                 <h6 className="text-muted text-uppercase fw-bold mb-1" style={{ fontSize: '0.75rem', letterSpacing: '1px' }}>Total Registered Users</h6>
-                <h2 className="fw-bold mb-0">20</h2>
+                <h2 className="fw-bold mb-0">{users.length}</h2>
               </div>
               {/* Subtle background decoration */}
               <i className="bi bi-people position-absolute text-light" style={{ fontSize: '5rem', right: '-10px', bottom: '-20px', opacity: '0.3' }}></i>
@@ -54,12 +87,12 @@ function AdminDashboard() {
               <div className="card-body text-white">
                 <div className="d-flex justify-content-between align-items-center mb-3">
                   <div className="bg-white bg-opacity-20 p-3 rounded-3">
-                    <i className="bi bi-ticket-detailed text-white fs-4"></i>
+                    <i className="bi bi-ticket-detailed text-primary fs-4"></i>
                   </div>
                   <span className="badge bg-white bg-opacity-25 rounded-pill">Monthly Target</span>
                 </div>
                 <h6 className="text-white-50 text-uppercase fw-bold mb-1" style={{ fontSize: '0.75rem', letterSpacing: '1px' }}>Total Bookings</h6>
-                <h2 className="fw-bold mb-0">500</h2>
+                <h2 className="fw-bold mb-0">{booking.length}</h2>
               </div>
               <i className="bi bi-ticket position-absolute text-white" style={{ fontSize: '5rem', right: '-10px', bottom: '-20px', opacity: '0.1' }}></i>
             </div>
@@ -79,7 +112,7 @@ function AdminDashboard() {
                   </div>
                 </div>
                 <h6 className="text-muted text-uppercase fw-bold mb-1" style={{ fontSize: '0.75rem', letterSpacing: '1px' }}>Buses Currently Active</h6>
-                <h2 className="fw-bold mb-0">43</h2>
+                <h2 className="fw-bold mb-0">{activeBus.length}</h2>
               </div>
               <i className="bi bi-geo-alt position-absolute text-light" style={{ fontSize: '5rem', right: '-10px', bottom: '-20px', opacity: '0.3' }}></i>
             </div>

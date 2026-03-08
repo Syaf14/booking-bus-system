@@ -19,7 +19,8 @@ exports.getAllUsers = async (req, res) => {
                 COALESCE(p.full_name, u.name) AS display_name
             FROM users u
             LEFT JOIN profiles p ON u.id = p.user_id
-            WHERE u.role IN ('student', 'admin') 
+            WHERE u.role IN ('student','class rep', 'admin') 
+            AND u.deleted_at IS NULL
             ORDER BY u.created_at DESC
         `;
 
@@ -35,13 +36,38 @@ exports.getAllUsers = async (req, res) => {
 
 // Delete User
 exports.deleteUser = async (req, res) => {
-    const { id } = req.params;
     try {
-        const query = "DELETE FROM users WHERE id = ?";
-        await db.query(query, [id]);
-        res.status(200).json({ message: "User deleted successfully" });
+        const { id } = req.params;
+        const query =  `UPDATE users
+        SET deleted_at = NOW()
+        WHERE id = ?`;
+
+        const [result] = await db.query(query, [id]);
+        if (result.affectedRows > 0) {
+            res.json({ message: "User deleted successfully" });
+        } else {
+            res.status(404).json({ message: "User Not Found" });
+        }
     } catch (err) {
         console.error("Delete error:", err);
         res.status(500).json({ message: "Failed to delete user" });
     }
 };
+
+/*try {
+        const bookingId = req.params.id;
+        const sql = `UPDATE bookings
+        SET deleted_at = NOW()
+        WHERE id = ?`;
+
+        const [result] = await db.query(sql, [bookingId]);
+
+        if (result.affectedRows > 0) {
+            res.json({ message: "Booking deleted successfully" });
+        } else {
+            res.status(404).json({ message: "Bus not found" });
+        }
+    } catch (err) {
+        console.error("Delete error:", err);
+        res.status(500).json({ message: "Delete failed", error: err.message });
+    }*/

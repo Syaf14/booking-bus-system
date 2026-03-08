@@ -102,7 +102,7 @@ const AdminLayout = ({ children }) => {
           <nav className="navbar navbar-expand navbar-light bg-white border-bottom px-4 shadow-sm" style={{ height: "60px" }}>
             <span className="navbar-brand mb-0 h6 text-muted">
                 {/* Dynamically show page name in top bar */}
-                {location.pathname.replace('/admin-', '').replace('-', ' ').replace('-', ' ').toUpperCase()}
+                {location.pathname.replace('/', '').replace('/admin-', '').replace('-', ' ').replace('-', ' ').toUpperCase()}
             </span>
           </nav>
 

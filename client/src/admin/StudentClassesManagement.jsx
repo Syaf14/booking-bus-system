@@ -1,7 +1,40 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import AdminLayout from '../global/AdminLayout'
+import { useNavigate } from 'react-router-dom'
+import axios from 'axios';
 
 function StudentClassesManagement() {
+    const navigate = useNavigate();
+    const [searchTerm, setSearchTerm] = useState("");
+    const [studentClasses, setStudentClasses] = useState([]);
+
+    useEffect(() => {
+        fetchStudentClasses();
+    },[])
+
+    const fetchStudentClasses = async () => {
+        try {
+            console.log("Attempting to fetch from API...");
+            const response = await axios.get(`http://localhost:5000/api/studentClassManagement/get-all-student-classes`);
+            
+            console.log("Full API Response:", response);
+            console.log("Data received:", response.data);
+
+            // Ensure we are setting an array
+            if (Array.isArray(response.data)) {
+                setStudentClasses(response.data);
+            } else {
+                console.error("Data is not an array! Check backend return format.");
+            }
+        } catch (error) {
+            console.error("Axios Error Details:", error.response || error);
+        }
+    }
+
+    const filteredStudentClasses = studentClasses.filter(c => 
+    c.class_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    c.rep_email?.toLowerCase().includes(searchTerm.toLowerCase())
+);
   return (
     <AdminLayout>
       <div className="container-fluid py-4" style={{ backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
@@ -14,14 +47,17 @@ function StudentClassesManagement() {
                     </div>
                     
                     <div className="d-flex shadow-sm rounded-3 overflow-hidden" style={{ width: '350px' }}>
-                        <input 
-                            type="text" 
-                            className="form-control border-0 py-2 ps-3" 
-                            placeholder="Search by student email..."
-                        />
-                        <button className="btn btn-primary px-3 border-0 rounded-0">
-                            <i className="bi bi-search"></i>
-                        </button>
+                        <div className='input-group shadow-sm'>
+                            <span className='input-group-text bg-white border-end-0'>
+                                <i className="bi bi-search"></i>
+                            </span>
+                            <input 
+                                type="text" 
+                                className="form-control border-start-0 py-2 ps-3" 
+                                placeholder="Search by class name....."
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                        </div>
                     </div>
                 </div>
 
@@ -48,33 +84,35 @@ function StudentClassesManagement() {
                                 </tr>
                             </thead>
                             <tbody className="bg-white">
-                                    <tr>
-                                        <td className="ps-4 fw-bold text-muted"></td>
-                                        <td>
-                                            
-                                        </td>
+                                {filteredStudentClasses.map((item, index) => (
+                                    <tr key={item.id}>
+                                        <td className="ps-4 fw-bold text-muted">{index + 1}</td>
+                                        <td>{item.class_name}</td> {/* Changed from student.name */}
                                         <td className="text-center">
                                             <span className="badge bg-dark rounded-1 px-3 py-2">
-                                                <i className="bi bi-bus-front me-1"></i>
+                                                Sem {item.semester}
                                             </span>
                                         </td>
-                                        <td>
-                                            <div className="d-flex align-items-center">
-                                                <div className="rounded-circle bg-light d-flex align-items-center justify-content-center me-2" style={{ width: '32px', height: '32px' }}>
-                                                    <i className="bi bi-person text-secondary"></i>
-                                                </div>
-                                                <span className="fw-semibold"></span>
-                                            </div>
+                                        <td className="text-center">
+                                            <span className="fw-semibold">{item.capacity_class}</span>
                                         </td>
-                                        <td>
-                                            
+                                        <td className="text-center">
+                                            {/* Show Rep Name or 'No Rep Assigned' */}
+                                            {item.rep_name ? (
+                                                <div>
+                                                    <div className="small fw-bold">{item.rep_name}</div>
+                                                    <div className="text-muted x-small">{item.rep_email}</div>
+                                                </div>
+                                            ) : (
+                                                <span className="text-muted italic">No Rep Assigned</span>
+                                            )}
                                         </td>
                                         <td className="text-end pe-4">
                                             <div className="btn-group shadow-sm">
                                                 <button className="btn btn-white btn-sm border" title="Edit Booking">
                                                     <i className="bi bi-pencil-square text-secondary"></i>
                                                 </button>
-                                                <button className="btn btn-white btn-sm border" title="View Details">
+                                                <button className="btn btn-white btn-sm border" title="View Details" onClick={() => navigate(`/detail-student-classes`)}>
                                                     <i className="bi bi-eye-fill text-primary"></i>
                                                 </button>
                                                 <button className="btn btn-white btn-sm border" title="Cancel Booking">
@@ -83,6 +121,7 @@ function StudentClassesManagement() {
                                             </div>
                                         </td>
                                     </tr>
+                                ))}
                             </tbody>
                         </table>
                     </div>

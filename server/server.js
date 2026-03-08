@@ -7,6 +7,7 @@ const busManagementRoutes = require('./routes/busManagementRoutes')
 const scheduleManagementRoutes = require('./routes/scheduleManagementRoutes')
 const bookingManagement = require('./routes/bookingRoutes')
 const userManagement = require('./routes/userManagementRoute')
+const studentClassesManagement = require('./routes/studentClassManagementRoutes')
 
 const app = express()
 
@@ -18,6 +19,7 @@ app.use('/api/busManagement', busManagementRoutes)
 app.use('/api/scheduleManagement', scheduleManagementRoutes)
 app.use('/api/bookingManagement', bookingManagement)
 app.use('/api/userManagement', userManagement)
+app.use('/api/studentClassManagement', studentClassesManagement)
 
 app.listen(5000, () => {
     console.log("Server running on http://localhost:5000")

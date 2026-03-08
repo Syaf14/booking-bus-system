@@ -39,6 +39,36 @@ exports.register = async (req, res) => {
     }
 };
 
+exports.registerAdmin = async (req, res) => {
+    const connection = await db.getConnection();
+    try {
+        const { name, email, password, role } = req.body;
+        
+        const [existingAdmins] = await connection.query("SELECT * FROM users WHERE email = ?", [email]);
+        if (existingAdmins.length > 0) {
+            await connection.rollback();
+            return res.status(400).json({ message: "Email already exists" });
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        await connection.beginTransaction();
+
+        await connection.query("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)", 
+            [name, email, hashedPassword, role]
+        );
+
+        await connection.commit();
+
+        res.json({ message: "Admin registered successfully" });
+    } catch (err) {
+        await connection.rollback();
+        res.status(500).json({ message: "Server error during registration", error: err.message });
+    } finally {
+        connection.release(); // 👈 prevents connection pool exhaustion
+    }
+};
+
 exports.login = async (req, res) => {
     try {
         const { email, password } = req.body;

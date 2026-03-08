@@ -39,11 +39,14 @@ function UserManagement() {
         }
     };
 
-    // Filter for Students
+    // Filter for Students and Class Reps
     const filteredStudents = users.filter(user => 
-        user.role?.toLowerCase() === 'student' && (
-        (user.full_name || user.name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (user.email || "").toLowerCase().includes(searchTerm.toLowerCase()))
+        ['student', 'class rep'].includes(user.role?.toLowerCase()) && (
+            (user.full_name || user.name || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (user.email || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (user.student_id || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+            (user.role || "").toLowerCase().includes(searchTerm.toLowerCase())
+        )
     );
 
     // Filter for Admins
@@ -63,10 +66,22 @@ function UserManagement() {
                         <h2 className="fw-bold text-dark mb-1">Student Management</h2>
                         <p className="text-muted small mb-0">Manage student profiles and IDs</p>
                     </div>
-                    <div className="input-group shadow-sm" style={{ width: '300px' }}>
-                        <span className="input-group-text bg-white border-end-0"><i className="bi bi-search"></i></span>
-                        <input type="text" className="form-control border-start-0" placeholder="Search Students..." onChange={(e) => setSearchTerm(e.target.value)} />
+                    <div className='d-flex'>
+                        <div className="input-group shadow-sm me-2" style={{ width: '300px' }}>
+                            <span className="input-group-text bg-white border-end-0"><i className="bi bi-search"></i></span>
+                            <input type="text" className="form-control border-start-0" placeholder="Search Students..." onChange={(e) => setSearchTerm(e.target.value)} />
+                        </div>
+                        <div className="input-group shadow-sm" style={{ width: '200px' }}>
+                            <span className="input-group-text bg-white border-end-0"><i className="bi bi-check"></i></span>
+                            <select name="" id="" className='form-select' onChange={(e) => setSearchTerm(e.target.value)}>
+                                <option value="" selected disabled>--select role--</option>
+                                <option value="">All</option>
+                                <option value="student">student</option>
+                                <option value="class rep">class rep</option>
+                            </select>                                   
+                        </div>
                     </div>
+
                 </div>
 
                 <div className="card border-0 shadow-sm rounded-4 overflow-hidden mx-3 mb-5">
@@ -77,6 +92,7 @@ function UserManagement() {
                                     <th className="ps-4 py-3">Student Name</th>
                                     <th>Student ID</th>
                                     <th>College</th>
+                                    <th>Role</th>
                                     <th className="pe-4 text-end">Actions</th>
                                 </tr>
                             </thead>
@@ -91,6 +107,9 @@ function UserManagement() {
                                         </td>
                                         <td><span className="badge bg-primary bg-opacity-10 text-primary">{user.student_id || 'N/A'}</span></td>
                                         <td className="small">{user.college_name || 'Not Set'}</td>
+                                        <td>
+                                            <span className='badge bg-success'>{user.role || 'Not Set'}</span>
+                                        </td>
                                         <td className="pe-4 text-end">
                                             <button onClick={() => handleDelete(user.id)} className="btn btn-sm btn-outline-danger border-0"><i className="bi bi-trash"></i></button>
                                         </td>
@@ -109,10 +128,18 @@ function UserManagement() {
                         <h2 className="fw-bold text-dark mb-1">System Administrators</h2>
                         <p className="text-muted small mb-0">Users with high-level access permissions</p>
                     </div>
-                    <div className="input-group shadow-sm" style={{ width: '300px' }}>
-                        <span className="input-group-text bg-white border-end-0"><i className="bi bi-shield-lock"></i></span>
-                        <input type="text" className="form-control border-start-0" placeholder="Search Admins..." onChange={(e) => setAdminSearchTerm(e.target.value)} />
+                    <div className='d-flex'>
+                        <div className="col-6 input-group shadow-sm me-2" style={{ width: '300px' }}>
+                            <span className="input-group-text bg-white border-end-0"><i className="bi bi-shield-lock"></i></span>
+                            <input type="text" className="form-control border-start-0" placeholder="Search Admins..." onChange={(e) => setAdminSearchTerm(e.target.value)} />
+                        </div>
+                        <div className="col-6 input-group">
+                            <span className="input-group-text bg-primary border-0"><i className="bi bi-plus text-white"></i></span>
+                            <button className='btn btn-primary border-start-0' onClick={() => navigate(`/add-admin`)}>Add Admin</button>
+                        </div>
                     </div>
+
+
                 </div>
 
                 <div className="card border-0 shadow-sm rounded-4 overflow-hidden mx-3 border-top border-danger border-4">

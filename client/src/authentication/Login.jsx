@@ -51,6 +51,9 @@ function Login() {
         
         {/* Header Section */}
         <div className="p-5 text-center bg-white">
+          <div className="mb-1">
+            <img src="/logo_politeknik.png" alt="" style={{height: "80px"}}/>
+          </div>
           <div className="mb-3">
             <div className="d-inline-flex align-items-center justify-content-center bg-primary-subtle rounded-circle" 
                  style={{ width: "80px", height: "80px" }}>
