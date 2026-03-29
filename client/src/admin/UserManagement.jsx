@@ -108,10 +108,18 @@ function UserManagement() {
                                         <td><span className="badge bg-primary bg-opacity-10 text-primary">{user.student_id || 'N/A'}</span></td>
                                         <td className="small">{user.college_name || 'Not Set'}</td>
                                         <td>
-                                            <span className='badge bg-success'>{user.role || 'Not Set'}</span>
+                                            <span className={`badge ${
+                                                user.role === 'student' ? 'bg-success' : 
+                                                user.role === 'class rep' ? 'bg-warning text-black' : 'bg-secondary'
+                                            }`}>
+                                                {user.role}
+                                            </span>
                                         </td>
                                         <td className="pe-4 text-end">
-                                            <button onClick={() => handleDelete(user.id)} className="btn btn-sm btn-outline-danger border-0"><i className="bi bi-trash"></i></button>
+                                            <div className='btn-group'>
+                                                <button onClick={() => navigate(`/admin-edit-student-management/${user.id}`)} className="btn btn-sm btn-outline-secondary"><i className="bi bi-pencil-square"></i></button>
+                                                <button onClick={() => handleDelete(user.id)} className="btn btn-sm btn-outline-danger"><i className="bi bi-trash"></i></button>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))}

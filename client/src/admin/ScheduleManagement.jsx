@@ -124,7 +124,7 @@ function ScheduleManagement() {
                                         </td>
                                         <td className="text-end pe-4">
                                             <div className="btn-group shadow-sm rounded-3 overflow-hidden">
-                                                <button className="btn btn-white btn-sm border-end px-3" title="View Details">
+                                                <button className="btn btn-white btn-sm border-end px-3" title="View Details" onClick={() => navigate(`/detail-schedule-management/${item.id}`)}>
                                                     <i className="bi bi-eye text-primary"></i>
                                                 </button>
                                                 <button className="btn btn-white btn-sm px-3" title="Delete Schedule" onClick={() => handleDelete(item.id)}>

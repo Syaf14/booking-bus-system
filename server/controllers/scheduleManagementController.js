@@ -59,7 +59,8 @@ exports.getScheduleById = async (req, res) => {
                 br.depart_location,
                 br.arrive_location,
                 br.depart_time,
-                br.arrive_time
+                br.arrive_time,
+                br.day_assigned
             FROM scheduled_bus sb
             LEFT JOIN bus_routes br ON br.id = sb.route_id
             LEFT JOIN buses b ON b.id = br.bus_id

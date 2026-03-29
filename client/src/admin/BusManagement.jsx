@@ -8,6 +8,11 @@ function BusManagement() {
     const [buses, setBuses] = useState([]);
     const [busRoute, setBusRoute] = useState([]);
 
+    // --- Search & Filter State ---
+    const [busSearch, setBusSearch] = useState("");
+    const [busStatusFilter, setBusStatusFilter] = useState("all");
+    const [routeDayFilter, setRouteDayFilter] = useState("all");
+
     // --- Pagination State ---
     const [busPage, setBusPage] = useState(1);
     const busPerPage = 10;
@@ -33,13 +38,27 @@ function BusManagement() {
         } catch (err) { console.error(err); }
     };
 
+    // --- Filter Logic ---
+    const filteredBuses = buses.filter(bus => {
+        const matchesCode = bus.bus_code.toLowerCase().includes(busSearch.toLowerCase());
+        const status = bus.deleted_at ? "inactive" : "active";
+        const matchesStatus = busStatusFilter === "all" || status === busStatusFilter;
+        return matchesCode && matchesStatus;
+    });
+
+    const filteredRoutes = busRoute.filter(route => {
+        // If route.day_assigned in your DB is already 'Isnin', 'Selasa', etc.
+        return routeDayFilter === "all" || route.day_assigned === routeDayFilter;
+    });
+
+    // --- Pagination Logic (Applied to filtered results) ---
     const indexOfLastBus = busPage * busPerPage;
     const indexOfFirstBus = indexOfLastBus - busPerPage;
-    const currentBuses = buses.slice(indexOfFirstBus, indexOfLastBus);
+    const currentBuses = filteredBuses.slice(indexOfFirstBus, indexOfLastBus);
 
     const indexOfLastRoute = routePage * routePerPage;
     const indexOfFirstRoute = indexOfLastRoute - routePerPage;
-    const currentRoutes = busRoute.slice(indexOfFirstRoute, indexOfLastRoute);
+    const currentRoutes = filteredRoutes.slice(indexOfFirstRoute, indexOfLastRoute);
 
     const paginateBuses = (pageNumber) => setBusPage(pageNumber);
     const paginateRoutes = (pageNumber) => setRoutePage(pageNumber);
@@ -80,65 +99,62 @@ function BusManagement() {
                 </div>
             </div>
 
-            {/* Quick Stats Summary */}
-            <div className="row px-3 mb-4">
-                <div className="col-md-3">
-                    <div className="card border-0 shadow-sm p-3 bg-white text-center rounded-4">
-                        <span className="text-muted small text-uppercase fw-bold">Total Bus</span>
-                        <h3 className="fw-bold text-primary mb-0">{buses.length}</h3>
-                    </div>
-                </div>
-                <div className="col-md-3">
-                    <div className="card border-0 shadow-sm p-3 bg-white text-center rounded-4">
-                        <span className="text-muted small text-uppercase fw-bold">Active Routes</span>
-                        <h3 className="fw-bold text-success mb-0">{busRoute.length}</h3>
-                    </div>
-                </div>
-            </div>
-
             {/* --- FLEET TABLE --- */}
             <div className="card border-0 shadow-sm mx-3 mb-5 rounded-4 overflow-hidden">
-                <div className="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
-                    <h5 className="mb-0 fw-bold">Bus Details <span className="badge bg-light text-dark ms-2 fw-normal">Page {busPage}</span></h5>
+                <div className="card-header bg-white border-0 py-3 d-flex flex-wrap justify-content-between align-items-center gap-3">
+                    <h5 className="mb-0 fw-bold">Bus Details</h5>
+                    <div className="d-flex gap-2">
+                        {/* Status Filter */}
+                        <select className="form-select form-select-sm border-0 bg-light" style={{width: '130px'}} 
+                            value={busStatusFilter} onChange={(e) => {setBusStatusFilter(e.target.value); setBusPage(1);}}>
+                            <option value="all">All Status</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                        {/* Search Bus Code */}
+                        <div className="input-group input-group-sm" style={{width: '200px'}}>
+                            <span className="input-group-text bg-light border-0"><i className="bi bi-search"></i></span>
+                            <input type="text" className="form-control border-0 bg-light" placeholder="Bus Code..." 
+                                value={busSearch} onChange={(e) => {setBusSearch(e.target.value); setBusPage(1);}} />
+                        </div>
+                    </div>
                 </div>
                 <div className="table-responsive">
-                    <table className="table table-bordered align-middle mb-0">
+                    <table className="table table-hover align-middle mb-0">
                         <thead className="bg-light">
                             <tr className="text-muted small">
                                 <th className="ps-4">No</th>
                                 <th>Code</th>
                                 <th>Vehicle Name</th>
-                                <th>Capacity Details</th>
+                                <th>Capacity</th>
                                 <th>Plate No</th>
-                                <th className="text-center">Operational Status</th>
+                                <th className="text-center">Status</th>
                                 <th className="text-end pe-4">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="bg-white">
                             {currentBuses.map((bus, index) => (
-                                <tr key={bus.id} style={{ borderBottom: '1px solid #f1f1f1' }}>
+                                <tr key={bus.id}>
                                     <td className="ps-4 text-muted">{indexOfFirstBus + index + 1}</td>
                                     <td><code className="text-primary fw-bold">{bus.bus_code}</code></td>
                                     <td className="fw-bold text-dark">{bus.bus_name}</td>
                                     <td>
-                                        <div className="d-flex gap-2">
-                                            <span className="badge bg-soft-blue text-primary border">💺 {bus.capacity_seat}</span>
-                                            <span className="badge bg-soft-gray text-muted border">🧍 {bus.capacity_standing}</span>
+                                        <div className="d-flex gap-2 small">
+                                            <span className="badge bg-light text-primary border">💺 {bus.capacity_seat}</span>
+                                            <span className="badge bg-light text-muted border">🧍 {bus.capacity_standing}</span>
                                         </div>
                                     </td>
-                                    <td>
-                                        <code className="text-primary fw-bold">{bus.plate_no}</code>
-                                    </td>
+                                    <td><code className="text-dark fw-bold">{bus.plate_no}</code></td>
                                     <td className="text-center">
                                         <span className={`px-3 py-1 rounded-pill small fw-bold ${bus.deleted_at ? 'bg-danger-subtle text-danger' : 'bg-success-subtle text-success'}`}>
                                             {bus.deleted_at ? 'Inactive' : 'Active'}
                                         </span>
                                     </td>
                                     <td className="text-end pe-4">
-                                        <button className="btn btn-light btn-sm me-2 rounded-3 border" title='Edit' onClick={() => navigate(`/admin-edit-bus-management/${bus.id}`)}>
+                                        <button className="btn btn-light btn-sm me-2 rounded-3 border" onClick={() => navigate(`/admin-edit-bus-management/${bus.id}`)}>
                                             <i className="bi bi-pencil"></i>
                                         </button>
-                                        <button className="btn btn-outline-danger btn-sm rounded-3" title='Deactivate' onClick={() => handleDelete(bus.id)}>
+                                        <button className="btn btn-outline-danger btn-sm rounded-3" onClick={() => handleDelete(bus.id)}>
                                             <i className="bi bi-trash"></i>
                                         </button>
                                     </td>
@@ -149,7 +165,7 @@ function BusManagement() {
                 </div>
                 <div className="card-footer bg-white border-0 py-3">
                     <div className="d-flex justify-content-center gap-1">
-                        {[...Array(Math.ceil(buses.length / busPerPage))].map((_, i) => (
+                        {[...Array(Math.ceil(filteredBuses.length / busPerPage))].map((_, i) => (
                             <button key={i} onClick={() => paginateBuses(i + 1)} className={`btn btn-sm rounded-circle ${busPage === i + 1 ? 'btn-primary px-3' : 'btn-light border text-muted'}`}>
                                 {i + 1}
                             </button>
@@ -160,11 +176,27 @@ function BusManagement() {
 
             {/* --- ROUTES TABLE --- */}
             <div className="card border-0 shadow-sm mx-3 rounded-4 overflow-hidden">
-                <div className="card-header bg-white border-0 py-3">
-                    <h5 className="mb-0 fw-bold text-success">Active Service Routes</h5>
+                <div className="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
+                    <h5 className="mb-0 fw-bold text-success">Active Bus Routes</h5>
+                    
+                    <select 
+                        className="form-select form-select-sm border-0 bg-light" 
+                        style={{ width: '160px' }} 
+                        value={routeDayFilter} 
+                        onChange={(e) => { setRouteDayFilter(e.target.value); setRoutePage(1); }}
+                    >
+                        <option value="all">Semua Hari</option>
+                        <option value="isnin">Isnin</option>
+                        <option value="selasa">Selasa</option>
+                        <option value="rabu">Rabu</option>
+                        <option value="khamis">Khamis</option>
+                        <option value="jumaat">Jumaat</option>
+                        <option value="sabtu">Sabtu</option>
+                        <option value="ahad">Ahad</option>
+                    </select>
                 </div>
                 <div className="table-responsive">
-                    <table className="table table-bordered align-middle mb-0">
+                    <table className="table table-hover align-middle mb-0">
                         <thead className="bg-light text-muted small">
                             <tr className='text-center'>
                                 <th className="ps-4 text-start">No</th>
@@ -206,7 +238,7 @@ function BusManagement() {
                 </div>
                 <div className="card-footer bg-white border-0 py-3 text-center">
                     <div className="d-flex justify-content-center gap-1">
-                        {[...Array(Math.ceil(busRoute.length / routePerPage))].map((_, i) => (
+                        {[...Array(Math.ceil(filteredRoutes.length / routePerPage))].map((_, i) => (
                             <button key={i} onClick={() => paginateRoutes(i + 1)} className={`btn btn-sm rounded-circle ${routePage === i + 1 ? 'btn-success px-3 text-white' : 'btn-light border'}`}>
                                 {i + 1}
                             </button>

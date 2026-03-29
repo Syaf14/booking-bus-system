@@ -39,11 +39,6 @@ function AdminDashboard() {
       console.log("Error fetch Bus: ", err)
     }
   }
-  const handleLogout = () => {
-    axios.post('http://localhost:5000/api/auth/logout') 
-    localStorage.removeItem('token'); 
-    navigate('/');
-  };
 
   return (
     <AdminLayout>
@@ -55,9 +50,6 @@ function AdminDashboard() {
             <h2 className="fw-bold text-dark mb-1">System Overview</h2>
             <p className="text-muted small mb-0">Welcome back, Admin. Here's what's happening today.</p>
           </div>
-          <button className="btn btn-outline-danger px-4 fw-bold shadow-sm" onClick={handleLogout}>
-            <i className="bi bi-box-arrow-right me-2"></i>Logout
-          </button>
         </div>
 
         {/* Dashboard Grid */}
@@ -71,7 +63,6 @@ function AdminDashboard() {
                   <div className="bg-primary bg-opacity-10 p-3 rounded-3">
                     <i className="bi bi-people-fill text-primary fs-4"></i>
                   </div>
-                  <span className="text-success small fw-bold">+12% <i className="bi bi-arrow-up"></i></span>
                 </div>
                 <h6 className="text-muted text-uppercase fw-bold mb-1" style={{ fontSize: '0.75rem', letterSpacing: '1px' }}>Total Registered Users</h6>
                 <h2 className="fw-bold mb-0">{users.length}</h2>

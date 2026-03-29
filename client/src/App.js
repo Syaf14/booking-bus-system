@@ -2,6 +2,7 @@ import React from 'react'
 import {BrowserRouter, Routes, Route} from 'react-router-dom'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap-icons/font/bootstrap-icons.css';
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import Login from './authentication/Login'
 import Register from './authentication/Register'
 import AdminDashboard from './admin/AdminDashboard'
@@ -27,6 +28,12 @@ import EditProfile from './profile/EditProfile';
 import StudentClassesManagement from './admin/StudentClassesManagement';
 import AddAdmin from './admin/user_management/AddAdmin';
 import DetailStudentClass from './admin/student_class_management/DetailStudentClass';
+import DetailScheduleManagement from './admin/schedule_management/DetailScheduleManagement';
+import EditBookingManagement from './admin/booking_management/EditBookingManagement';
+import DetailBookingManagement from './admin/booking_management/DetailBookingManagement';
+import EditStudentClass from './admin/student_class_management/EditStudentClass';
+import EditStudentManagement from './admin/user_management/EditStudentManagement';
+import ReportSubmit from './pages/ReportSubmit';
 
 function App() {
   return (
@@ -41,14 +48,20 @@ function App() {
         <Route path="/admin-edit-bus-management/:id" element={<EditBus />} />
         <Route path="/admin-schedule-management" element={<ScheduleManagement />}/>
         <Route path="/admin-booking-management" element={<BookingManagement />}/>
+        <Route path="/admin-edit-booking-management/:id" element={<EditBookingManagement />} />
         <Route path="/admin-user-management" element={<UserManagement />}/>
+        <Route path="/admin-edit-student-management/:id" element={<EditStudentManagement />} />
         <Route path="/admin-student-classes-management" element={<StudentClassesManagement />}/>
+        <Route path="/admin-edit-student-classes-management/:id" element={<EditStudentClass />} />
         <Route path="/admin-report-notification-management" element={<ReportNotificationManagement />}/>
         <Route path="/add-bus" element={<AddBus />}/>
         <Route path="/add-bus-route" element={<AddBusRoute />} />
         <Route path="/add-schedule-bus" element={<AddScheduleManagement />}/>
         <Route path="/add-admin" element={<AddAdmin />}/>
-        <Route path="/detail-student-classes" element={<DetailStudentClass />} />
+        <Route path="/detail-student-classes/:id" element={<DetailStudentClass />} />
+        <Route path="/detail-schedule-management/:id" element={<DetailScheduleManagement />} />
+        <Route path="/detail-booking-management/:id" element={<DetailBookingManagement />} />
+
 
         <Route path="/student-dashboard" element={<Dashboard />} />
         <Route path="/student-class-rep-dashboard" element={<ClassRepDashboard />} />  
@@ -57,6 +70,7 @@ function App() {
         <Route path="/seat-booking/:id" element={<SeatBook />} />
         <Route path="/profile/:id" element={<Profile />} />
         <Route path="/edit-profile/:id" element={<EditProfile />} />
+        <Route path="/submit-report/:id" element={<ReportSubmit />} />
         <Route path="/ticket/:id" element={<Ticket />} />
         <Route path="/ticket-class-rep/:id" element={<ClassRepTicket />} />
       </Routes>

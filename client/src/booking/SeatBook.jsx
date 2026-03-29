@@ -2,6 +2,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import UserLayout from '../global/UserLayout';
+import '../App.css'
 
 const SeatIcon = ({ seat, isSelected, isBooked, onClick }) => {
     // Priority: Selection (Green) > Booked (Grey) > Active (Blue) > Inactive (Lighter Grey)
@@ -43,6 +44,7 @@ function SeatBook() {
     const [busSeat, setBusSeat] = useState([]);
     const [bookedSeats, setBookedSeats] = useState([]); // Array of seat IDs already taken
     const [selectedSeat, setSelectedSeat] = useState(null);
+    const [bookingType, setBookingType] = useState("normal");
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -119,6 +121,7 @@ function SeatBook() {
             const bookingData = {
                 scheduled_id: id,
                 seat_id: selectedSeat.id,
+                booking_type: bookingType,
                 // user_id is NOT sent here; backend handles it via token
             };
 
@@ -251,7 +254,7 @@ function SeatBook() {
             </div>
 
             {/* BAR */}
-            <div className='fixed-bottom shadow-lg' style={{ background: "#ffffff", borderTop: "4px solid #28a745", height: "12vh", zIndex: "1000" }}>
+            <div className='fixed-bottom shadow-lg' style={{ background: "#ffffff", borderTop: "4px solid #28a745", height: "20vh", zIndex: "1000" }}>
                 <div className='container h-100 d-flex align-items-center justify-content-between'>
                     <div>
                         <p className="mb-0 text-muted small text-uppercase">You've Picked</p>
@@ -259,13 +262,55 @@ function SeatBook() {
                             Seat {selectedSeat ? selectedSeat.seat_number : "--"}
                         </h4>
                     </div>
-                    <button 
-                        className={`btn btn-lg px-5 fw-bold rounded-pill ${selectedSeat ? 'btn-success shadow' : 'btn-secondary opacity-50'}`}
-                        disabled={!selectedSeat}
-                        onClick={confirmBooking}
-                    >
-                        PROCEED TO BOOK
-                    </button>
+                    <div>
+                        <div className="d-flex p-1 bg-light rounded-pill border mb-2" style={{ position: 'relative' }}>                           
+                            {/* Student Option */}
+                            <div className="flex-fill">
+                            <input 
+                                type="radio" 
+                                className="btn-check" 
+                                name="booking_type" 
+                                id="bookingNormal" 
+                                value="normal"
+                                checked={bookingType === "normal"}
+                                onChange={(e) => setBookingType(e.target.value)}
+                            />
+                            <label 
+                                className="btn btn-booking-type-toggle w-100 rounded-pill border-0 py-2 fw-bold" 
+                                htmlFor="bookingNormal"
+                            >
+                                Normal
+                            </label>
+                            </div>
+
+                            {/* Class Rep Option */}
+                            <div className="flex-fill">
+                            <input 
+                                type="radio" 
+                                className="btn-check" 
+                                name="booking_type" 
+                                id="bookingClass" 
+                                value="class"
+                                checked={bookingType === "class"}
+                                onChange={(e) => setBookingType(e.target.value)} 
+                            />
+                            <label 
+                                className="btn btn-booking-type-toggle w-100 rounded-pill border-0 py-2 fw-bold" 
+                                htmlFor="bookingClass"
+                            >
+                                Class
+                            </label>
+                            </div>
+                        </div>
+                        <button 
+                            className={`btn btn-lg px-5 fw-bold rounded-pill ${selectedSeat ? 'btn-success shadow' : 'btn-secondary opacity-50'}`}
+                            disabled={!selectedSeat}
+                            onClick={confirmBooking}
+                        >
+                            PROCEED TO BOOK
+                        </button>                        
+                    </div>
+
                 </div>
             </div>
         </UserLayout>

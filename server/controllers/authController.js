@@ -141,9 +141,10 @@ exports.getUserProfile = async (req, res) => {
         p.phone_no,
         p.student_id,
         p.user_id AS id,
+        p.college_name,
         u.email,
         u.role,
-        sc.name
+        sc.name AS class_name
         FROM profiles p
         LEFT JOIN users u ON u.id = p.user_id
         LEFT JOIN student_classes sc ON sc.id = p.class_id

@@ -109,10 +109,10 @@ function StudentClassesManagement() {
                                         </td>
                                         <td className="text-end pe-4">
                                             <div className="btn-group shadow-sm">
-                                                <button className="btn btn-white btn-sm border" title="Edit Booking">
+                                                <button className="btn btn-white btn-sm border" title="Edit Booking" onClick={() => navigate(`/admin-edit-student-classes-management/${item.id}`)}>
                                                     <i className="bi bi-pencil-square text-secondary"></i>
                                                 </button>
-                                                <button className="btn btn-white btn-sm border" title="View Details" onClick={() => navigate(`/detail-student-classes`)}>
+                                                <button className="btn btn-white btn-sm border" title="View Details" onClick={() => navigate(`/detail-student-classes/${item.id}`)}>
                                                     <i className="bi bi-eye-fill text-primary"></i>
                                                 </button>
                                                 <button className="btn btn-white btn-sm border" title="Cancel Booking">

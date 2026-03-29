@@ -56,3 +56,43 @@
 .btn-role-toggle:hover:not(.btn-check:checked + .btn-role-toggle) {
   background-color: #e9ecef;
 }
+
+/*SeatBook.jsx*/
+.btn-booking-type-toggle {
+  color: #6c757d; /* Muted text */
+  background-color: transparent;
+  transition: all 0.3s ease;
+  font-size: 0.85rem;
+}
+
+/* Selected state (When radio is checked) */
+.btn-check:checked + .btn-booking-type-toggle {
+  background-color: #3c97b3 !important; /* Your brand blue background */
+  color: white !important;               /* White text for contrast */
+  box-shadow: 0 2px 5px rgba(17, 80, 175, 0.3);
+}
+
+/* Hover effect for the one not selected */
+.btn-booking-type-toggle:hover:not(.btn-check:checked + .btn-booking-type-toggle) {
+  background-color: #e9ecef;
+}
+
+/*ClassRepTicket.jsx*/
+.extra-small { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.5px; }
+.border-end-dashed { border-right: 2px dashed #e9ecef; position: relative; }
+
+/* Mock ticket punch holes */
+@media (min-width: 768px) {
+  .border-end-dashed::before, .border-end-dashed::after {
+    content: "";
+    position: absolute;
+    right: -11px;
+    width: 20px;
+    height: 20px;
+    background: #f8f9fa; /* Matches your background color */
+    border-radius: 50%;
+    z-index: 2;
+  }
+  .border-end-dashed::before { top: -10px; }
+  .border-end-dashed::after { bottom: -10px; }
+}
