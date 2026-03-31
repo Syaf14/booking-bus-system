@@ -90,7 +90,7 @@ function EditStudentClass() {
                                                 value={formData.semester}
                                                 onChange={handleChange}
                                             >
-                                                {[1,2,3,4,5,6,7,8].map(s => <option key={s} value={s}>Semester {s}</option>)}
+                                                {[1,2].map(s => <option key={s} value={s}>Semester {s}</option>)}
                                             </select>
                                         </div>
                                         <div className="col-md-6 mb-3">

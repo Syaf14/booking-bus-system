@@ -37,7 +37,12 @@ function Ticket() {
   }
 
   const filteredTickets = tickets.filter(ticket => {
-    if (filterStatus === 'all') return true;
+    // If 'all' is selected, only show tickets with 'confirmed' status
+    if (filterStatus === 'all') {
+      return ticket.status.toLowerCase() === 'confirmed';
+    }
+    
+    // For other filters (pending, cancelled), show exactly that status
     return ticket.status.toLowerCase() === filterStatus.toLowerCase();
   });
 
@@ -57,7 +62,7 @@ function Ticket() {
 
         {/* Filter Navigation Bar */}
         <div className="d-flex gap-2 mb-4 overflow-auto pb-2">
-          {['all', 'confirmed', 'pending', 'cancelled'].map((status) => (
+          {['all', 'pending', 'cancelled'].map((status) => (
             <button
               key={status}
               onClick={() => setFilterStatus(status)}
@@ -66,7 +71,8 @@ function Ticket() {
               }`}
               style={{ fontSize: '0.7rem', letterSpacing: '0.5px', transition: 'all 0.3s' }}
             >
-              {status}
+              {/* If status is 'all', show 'ACTIVE', otherwise show the status name */}
+              {status === 'all' ? 'Active / Confirmed' : status}
             </button>
           ))}
         </div>

@@ -47,22 +47,16 @@ exports.getAllBusRoutes = async (req, res) => {
 exports.getAvailableBusRoutes = async (req, res) => {
     try {
         const sql = `
-            SELECT br.*, b.bus_name, b.bus_code, b.plate_no
+            SELECT br.*, b.bus_code, sb.status as schedule_status
             FROM bus_routes br
             LEFT JOIN buses b ON b.id = br.bus_id
-            WHERE br.deleted_at IS NULL
-            /* Only show routes not yet scheduled */
-            AND br.id NOT IN (
-                SELECT route_id FROM scheduled_bus WHERE deleted_at IS NULL
-            )
-            ORDER BY 
-                FIELD(br.day_assigned, 'Isnin', 'Selasa', 'Rabu', 'Khamis', 'Jumaat', 'Sabtu', 'Ahad') ASC,
-                br.depart_time ASC
+            LEFT JOIN scheduled_bus sb ON sb.route_id = br.id
+            WHERE sb.status = 'inactive' OR sb.id IS NULL
         `;
         const [rows] = await db.query(sql);
         res.json(rows);
     } catch (err) {
-        res.status(500).json({ message: "Database error" });
+        res.status(500).json({ message: "Error fetching data", error: err.message });
     }
 };
 

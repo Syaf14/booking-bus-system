@@ -91,7 +91,7 @@ function UserManagement() {
                                 <tr>
                                     <th className="ps-4 py-3">Student Name</th>
                                     <th>Student ID</th>
-                                    <th>College</th>
+                                    <th>Class</th>
                                     <th>Role</th>
                                     <th className="pe-4 text-end">Actions</th>
                                 </tr>
@@ -106,7 +106,7 @@ function UserManagement() {
                                             <div className="text-muted small">{user.email}</div>
                                         </td>
                                         <td><span className="badge bg-primary bg-opacity-10 text-primary">{user.student_id || 'N/A'}</span></td>
-                                        <td className="small">{user.college_name || 'Not Set'}</td>
+                                        <td className="small"><span className='badge bg-info text-dark'>{user.class_name || 'Not Set'}</span></td>
                                         <td>
                                             <span className={`badge ${
                                                 user.role === 'student' ? 'bg-success' : 
@@ -118,7 +118,7 @@ function UserManagement() {
                                         <td className="pe-4 text-end">
                                             <div className='btn-group'>
                                                 <button onClick={() => navigate(`/admin-edit-student-management/${user.id}`)} className="btn btn-sm btn-outline-secondary"><i className="bi bi-pencil-square"></i></button>
-                                                <button onClick={() => handleDelete(user.id)} className="btn btn-sm btn-outline-danger"><i className="bi bi-trash"></i></button>
+                                                <button onClick={() => handleDelete(user.id)} className="btn btn-sm btn-outline-danger" title='Delete User'><i className="bi bi-trash"></i></button>
                                             </div>
                                         </td>
                                     </tr>

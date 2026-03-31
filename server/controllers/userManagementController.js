@@ -15,10 +15,12 @@ exports.getAllUsers = async (req, res) => {
                 p.gender, 
                 p.college_name, 
                 p.student_id,
+                sc.name AS class_name,
                 /* Fallback: if profile name is missing, use account name */
                 COALESCE(p.full_name, u.name) AS display_name
             FROM users u
             LEFT JOIN profiles p ON u.id = p.user_id
+            LEFT JOIN student_classes sc ON sc.id = p.class_id
             WHERE u.role IN ('student','class rep', 'admin') 
             AND u.deleted_at IS NULL
             ORDER BY u.created_at DESC

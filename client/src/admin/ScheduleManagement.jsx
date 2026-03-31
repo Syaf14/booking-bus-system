@@ -7,6 +7,10 @@ function ScheduleManagement() {
     const navigate = useNavigate();
     const [schedule, setSchedule] = useState([]);
     
+    // --- Filter State ---
+    const [busCodeFilter, setBusCodeFilter] = useState('');
+    const [dayFilter, setDayFilter] = useState('');
+
     // --- Pagination State ---
     const [currentPage, setCurrentPage] = useState(1);
     const recordsPerPage = 15;
@@ -32,11 +36,19 @@ function ScheduleManagement() {
         } catch (err) { console.error(err); }
     };
 
-    // --- Pagination Logic ---
+    // --- Filter & Pagination Logic ---
+    // 1. Filter the data first
+    const filteredRecords = schedule.filter(item => {
+        const matchesBus = item.bus_code.toLowerCase().includes(busCodeFilter.toLowerCase());
+        const matchesDay = dayFilter === '' || item.day_assigned === dayFilter;
+        return matchesBus && matchesDay;
+    });
+
+    // 2. Paginate the filtered results
     const lastIndex = currentPage * recordsPerPage;
     const firstIndex = lastIndex - recordsPerPage;
-    const currentRecords = schedule.slice(firstIndex, lastIndex);
-    const npage = Math.ceil(schedule.length / recordsPerPage);
+    const currentRecords = filteredRecords.slice(firstIndex, lastIndex);
+    const npage = Math.ceil(filteredRecords.length / recordsPerPage);
     const numbers = [...Array(npage + 1).keys()].slice(1);
 
     const prePage = () => {
@@ -68,6 +80,42 @@ function ScheduleManagement() {
                     </div>
                 </div>
 
+                {/* Filter Section */}
+                <div className="card border-0 shadow-sm mx-3 rounded-4 mb-4">
+                    <div className="card-body p-3">
+                        <div className="row g-3">
+                            <div className="col-md-4">
+                                <label className="form-label small fw-bold text-muted">Search Bus Code</label>
+                                <div className="input-group input-group-sm">
+                                    <span className="input-group-text bg-white border-end-0"><i className="bi bi-search"></i></span>
+                                    <input 
+                                        type="text" 
+                                        className="form-control border-start-0" 
+                                        placeholder="e.g. BUK1234"
+                                        value={busCodeFilter}
+                                        onChange={(e) => {setBusCodeFilter(e.target.value); setCurrentPage(1);}}
+                                    />
+                                </div>
+                            </div>
+                            <div className="col-md-3">
+                                <label className="form-label small fw-bold text-muted">Filter by Day</label>
+                                <select 
+                                    className="form-select form-select-sm"
+                                    value={dayFilter}
+                                    onChange={(e) => {setDayFilter(e.target.value); setCurrentPage(1);}}
+                                >
+                                    <option value="">Semua Hari (All Days)</option>
+                                    <option value="isnin">Isnin</option>
+                                    <option value="selasa">Selasa</option>
+                                    <option value="rabu">Rabu</option>
+                                    <option value="khamis">Khamis</option>
+                                    <option value="jumaat">Jumaat</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 {/* Schedule Table Card */}
                 <div className="card border-0 shadow-sm mx-3 rounded-4 overflow-hidden">
                     <div className="card-header bg-white border-0 py-3">
@@ -83,7 +131,7 @@ function ScheduleManagement() {
                         <table className="table table-bordered align-middle mb-0">
                             <thead className="bg-light">
                                 <tr className="text-muted small text-uppercase">
-                                    <th className="ps-4" style={{ width: "80px" }}>No</th>
+                                    <th className="ps-4" style={{ width: "60px" }}>No</th>
                                     <th>Route Path</th>
                                     <th className="text-center">Day</th>
                                     <th className="text-center">Departure</th>
@@ -93,7 +141,6 @@ function ScheduleManagement() {
                                 </tr>
                             </thead>
                             <tbody className="bg-white">
-                                {/* Use currentRecords instead of schedule.map */}
                                 {currentRecords.map((item, index) => (
                                     <tr key={item.id} className="hover-row">
                                         <td className="ps-4 fw-bold text-muted">{firstIndex + index + 1}</td>
@@ -102,6 +149,8 @@ function ScheduleManagement() {
                                                 <span className="fw-bold text-dark">{item.depart_location}</span>
                                                 <i className="bi bi-arrow-right mx-2 text-primary"></i>
                                                 <span className="fw-bold text-dark">{item.arrive_location}</span>
+                                                <span className='mx-2'>||</span>
+                                                <span className='fw-bold text-dark'>{item.bus_code}</span>
                                             </div>
                                         </td>
                                         <td className='text-center'>
@@ -118,29 +167,31 @@ function ScheduleManagement() {
                                             </span>
                                         </td>
                                         <td className="text-center">
-                                            <span className="badge bg-success-subtle text-success rounded-pill px-3">
-                                                Confirmed
+                                            <span className={`badge ${item.status === 'active' ? 'bg-success-subtle text-success' : 'bg-secondary-subtle text-secondary'} rounded-pill px-3`}>
+                                                {item.status}
                                             </span>
                                         </td>
                                         <td className="text-end pe-4">
-                                            <div className="btn-group shadow-sm rounded-3 overflow-hidden">
-                                                <button className="btn btn-white btn-sm border-end px-3" title="View Details" onClick={() => navigate(`/detail-schedule-management/${item.id}`)}>
-                                                    <i className="bi bi-eye text-primary"></i>
-                                                </button>
-                                                <button className="btn btn-white btn-sm px-3" title="Delete Schedule" onClick={() => handleDelete(item.id)}>
-                                                    <i className="bi bi-trash3 text-danger"></i>
-                                                </button>
-                                            </div>
+                                            {item.status === 'active' && (
+                                                <div className="btn-group shadow-sm rounded-3 overflow-hidden">
+                                                    <button className="btn btn-white btn-sm border-end px-3" onClick={() => navigate(`/detail-schedule-management/${item.id}`)}>
+                                                        <i className="bi bi-info-circle-fill text-primary"></i>
+                                                    </button>
+                                                    <button className="btn btn-white btn-sm px-3" title="Deactivate" onClick={() => handleDelete(item.id)}>
+                                                        <i className="bi bi-eye-slash text-danger"></i>
+                                                    </button>
+                                                </div>
+                                            )}
                                         </td>
                                     </tr>
                                 ))}
 
-                                {schedule.length === 0 && (
+                                {filteredRecords.length === 0 && (
                                     <tr>
                                         <td colSpan="7" className="py-5 text-center">
                                             <div className="text-muted">
-                                                <i className="bi bi-calendar-x display-4"></i>
-                                                <p className="mt-2">No schedules found in the database.</p>
+                                                <i className="bi bi-search display-4"></i>
+                                                <p className="mt-2">No matching schedules found.</p>
                                             </div>
                                         </td>
                                     </tr>
@@ -150,26 +201,28 @@ function ScheduleManagement() {
                     </div>
                     
                     {/* Pagination Footer */}
-                    <div className="card-footer bg-white border-0 py-3 d-flex justify-content-between align-items-center">
-                        <small className="text-muted">
-                            Showing {firstIndex + 1} to {Math.min(lastIndex, schedule.length)} of {schedule.length} entries
-                        </small>
-                        <nav>
-                            <ul className="pagination pagination-sm mb-0">
-                                <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-                                    <button className="page-link" onClick={prePage}>Previous</button>
-                                </li>
-                                {numbers.map((n, i) => (
-                                    <li className={`page-item ${currentPage === n ? 'active' : ''}`} key={i}>
-                                        <button className="page-link" onClick={() => changeCPage(n)}>{n}</button>
+                    {filteredRecords.length > 0 && (
+                        <div className="card-footer bg-white border-0 py-3 d-flex justify-content-between align-items-center">
+                            <small className="text-muted">
+                                Showing {firstIndex + 1} to {Math.min(lastIndex, filteredRecords.length)} of {filteredRecords.length} entries
+                            </small>
+                            <nav>
+                                <ul className="pagination pagination-sm mb-0">
+                                    <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                                        <button className="page-link" onClick={prePage}>Previous</button>
                                     </li>
-                                ))}
-                                <li className={`page-item ${currentPage === npage ? 'disabled' : ''}`}>
-                                    <button className="page-link" onClick={nextPage}>Next</button>
-                                </li>
-                            </ul>
-                        </nav>
-                    </div>
+                                    {numbers.map((n, i) => (
+                                        <li className={`page-item ${currentPage === n ? 'active' : ''}`} key={i}>
+                                            <button className="page-link" onClick={() => changeCPage(n)}>{n}</button>
+                                        </li>
+                                    ))}
+                                    <li className={`page-item ${currentPage === npage ? 'disabled' : ''}`}>
+                                        <button className="page-link" onClick={nextPage}>Next</button>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    )}
                 </div>
             </div>
         </AdminLayout>
