@@ -67,7 +67,14 @@ set /p MYSQL_PASSWORD="MySQL Password: "
 
 echo.
 echo Importing database...
-mysql -u %MYSQL_USER% -p%MYSQL_PASSWORD% < booking_bus_system.sql 2>nul
+
+REM Handle empty password (no -p flag needed)
+if "%MYSQL_PASSWORD%"=="" (
+    mysql -u %MYSQL_USER% < booking_bus_system.sql 2>nul
+) else (
+    mysql -u %MYSQL_USER% -p%MYSQL_PASSWORD% < booking_bus_system.sql 2>nul
+)
+
 if %ERRORLEVEL% NEQ 0 (
     color C
     echo.
