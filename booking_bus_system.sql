@@ -4,6 +4,9 @@ MySQL - 8.0.30 : Database - booking_bus_system
 *********************************************************************
 */
 
+CREATE DATABASE IF NOT EXISTS booking_bus_system;
+USE booking_bus_system;
+
 /*!40101 SET NAMES utf8 */;
 
 /*!40101 SET SQL_MODE=''*/;
