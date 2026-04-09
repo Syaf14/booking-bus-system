@@ -80,7 +80,6 @@ function AdminDashboard() {
                   <div className="bg-white bg-opacity-20 p-3 rounded-3">
                     <i className="bi bi-ticket-detailed text-primary fs-4"></i>
                   </div>
-                  <span className="badge bg-white bg-opacity-25 rounded-pill">Monthly Target</span>
                 </div>
                 <h6 className="text-white-50 text-uppercase fw-bold mb-1" style={{ fontSize: '0.75rem', letterSpacing: '1px' }}>Total Bookings</h6>
                 <h2 className="fw-bold mb-0">{booking.length}</h2>
@@ -120,7 +119,7 @@ function AdminDashboard() {
               </div>
               <div>
                 <h6 className="fw-bold mb-0">System Status: All Services Operational</h6>
-                <p className="text-muted small mb-0">Everything is running smoothly. Last system backup: 2 hours ago.</p>
+                <p className="text-muted small mb-0">Everything is running smoothly</p>
               </div>
             </div>
           </div>

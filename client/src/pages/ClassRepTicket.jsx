@@ -57,7 +57,13 @@ function ClassRepTicket() {
     }
   };
 
-  const filteredTickets = tickets.filter(t => filterStatus === 'all' || t.status.toLowerCase() === filterStatus.toLowerCase());
+  // Updated Logic: 'all' now acts as a filter for 'confirmed' tickets
+  const filteredTickets = tickets.filter(t => {
+    if (filterStatus === 'all') {
+      return t.status.toLowerCase() === 'confirmed';
+    }
+    return t.status.toLowerCase() === filterStatus.toLowerCase();
+  });
 
   if (loading) return <UserLayout><div className="text-center mt-5"><div className="spinner-border text-primary"></div></div></UserLayout>;
 
@@ -77,7 +83,7 @@ function ClassRepTicket() {
 
         {/* Status Filters */}
         <div className="d-flex gap-2 mb-4 overflow-auto pb-2">
-          {['all', 'confirmed', 'pending', 'cancelled'].map((status) => (
+          {['all', 'pending', 'cancelled'].map((status) => (
             <button
               key={status}
               onClick={() => setFilterStatus(status)}
@@ -86,7 +92,8 @@ function ClassRepTicket() {
               }`}
               style={{ fontSize: '0.65rem', letterSpacing: '0.5px' }}
             >
-              {status}
+              {/* Label logic: Change 'all' text to 'Active' or 'Confirmed' */}
+              {status === 'all' ? 'Active / Confirmed' : status}
             </button>
           ))}
         </div>

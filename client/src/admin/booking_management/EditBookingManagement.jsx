@@ -4,50 +4,58 @@ import axios from 'axios';
 import AdminLayout from '../../global/AdminLayout';
 
 function EditBookingManagement() {
-    const { id } = useParams(); // Grabs the ID from /edit-booking/:id
+    const { id } = useParams();
     const navigate = useNavigate();
     
     const [loading, setLoading] = useState(true);
+    const [seats, setSeats] = useState([]); // Store available seats
     const [formData, setFormData] = useState({
         email: '',
         status: '',
-        seat_number: '',
+        seat_id: '', // Store the ID now, not just the number
         seat_type: 'seated'
     });
 
-    // 1. Fetch the specific booking data by ID
     useEffect(() => {
-        const fetchBookingData = async () => {
+        const fetchData = async () => {
             try {
                 setLoading(true);
-                // Matches the backend route: /get-booking/:id
-                const response = await axios.get(`http://localhost:5000/api/bookingManagement/get-booking-by-id/${id}`);
                 
-                const data = response.data;
+                // 1. Fetch Booking Details
+                const bookingRes = await axios.get(`http://localhost:5000/api/bookingManagement/get-booking-by-id/${id}`);
+                const bData = bookingRes.data;
+
+                // 2. Fetch All Available Seats
+                const seatsRes = await axios.get(`http://localhost:5000/api/busManagement/get-bus-seat/`);
+                setSeats(seatsRes.data);
+
                 setFormData({
-                    email: data.email,
-                    status: data.status,
-                    seat_number: data.seat_number,
-                    seat_type: data.seat_type || 'seated'
+                    email: bData.email,
+                    status: bData.status,
+                    seat_id: bData.seat_id, // Map the seat_id from the booking
+                    seat_type: bData.seat_type || 'seated'
                 });
             } catch (err) {
-                console.error("Error fetching booking:", err);
-                alert("Failed to load booking details.");
+                console.error("Error fetching data:", err);
+                alert("Failed to load details.");
             } finally {
                 setLoading(false);
             }
         };
 
-        if (id) fetchBookingData();
+        if (id) fetchData();
     }, [id]);
 
-    // 2. Handle the Save/Update action
     const handleUpdate = async (e) => {
         e.preventDefault();
         try {
-            await axios.put(`http://localhost:5000/api/bookingManagement/update-booking/${id}`, formData);
+            // Sending seat_id and status to the backend
+            await axios.put(`http://localhost:5000/api/bookingManagement/update-booking/${id}`, {
+                status: formData.status,
+                seat_id: formData.seat_id
+            });
             alert("Booking Updated Successfully!");
-            navigate('/booking-management');
+            navigate('/admin-booking-management');
         } catch (err) {
             console.error("Update error:", err);
             alert(err.response?.data?.message || "Failed to update booking");
@@ -58,7 +66,7 @@ function EditBookingManagement() {
 
     return (
         <AdminLayout>
-            <div className="container-fluid py-4" style={{ backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
+            <div className="container-fluid py-4">
                 <div className="row justify-content-center">
                     <div className="col-lg-6">
                         <div className="card border-0 shadow-sm rounded-4">
@@ -69,70 +77,47 @@ function EditBookingManagement() {
                             <div className="card-body p-4">
                                 <form onSubmit={handleUpdate}>
                                     
-                                    {/* Student Email (Read Only - fetched from DB) */}
                                     <div className="mb-4">
                                         <label className="form-label text-muted small fw-bold">Student Email</label>
-                                        <input 
-                                            type="text" 
-                                            className="form-control bg-light border-0" 
-                                            value={formData.email} 
-                                            readOnly 
-                                        />
+                                        <input type="text" className="form-control bg-light border-0" value={formData.email} readOnly />
                                     </div>
 
-                                    <div className="row">
-                                        {/* Status Selection */}
-                                        <div className="col-md-12 mb-4">
-                                            <label className="form-label text-muted small fw-bold">Booking Status</label>
-                                            <select 
-                                                className="form-select border-2" 
-                                                value={formData.status}
-                                                onChange={(e) => setFormData({...formData, status: e.target.value})}
-                                            >
-                                                <option value="confirmed">Confirmed</option>
-                                                <option value="pending">Pending</option>
-                                                <option value="expired">Expired</option>
-                                                <option value="cancelled">Cancelled</option>
-                                            </select>
-                                        </div>
+                                    <div className="mb-4">
+                                        <label className="form-label text-muted small fw-bold">Booking Status</label>
+                                        <select 
+                                            className="form-select border-2" 
+                                            value={formData.status}
+                                            onChange={(e) => setFormData({...formData, status: e.target.value})}
+                                        >
+                                            <option value="confirmed">Confirmed</option>
+                                            <option value="pending">Pending</option>
+                                            <option value="expired">Expired</option>
+                                            <option value="cancelled">Cancelled</option>
+                                        </select>
+                                    </div>
 
-                                        {/* Seat Number */}
-                                        <div className="col-md-6 mb-4">
-                                            <label className="form-label text-muted small fw-bold">Seat Number</label>
-                                            <input 
-                                                type="text" 
-                                                className="form-control border-2" 
-                                                value={formData.seat_number}
-                                                onChange={(e) => setFormData({...formData, seat_number: e.target.value})}
-                                            />
-                                        </div>
-
-                                        {/* Seat Type */}
-                                        <div className="col-md-6 mb-4">
-                                            <label className="form-label text-muted small fw-bold">Seat Type</label>
-                                            <div className="d-flex gap-2">
-                                                <input 
-                                                    type="radio" className="btn-check" name="seatType" id="seated" 
-                                                    checked={formData.seat_type === 'seated' || formData.seat_type === 'normal'}
-                                                    onChange={() => setFormData({...formData, seat_type: 'normal'})}
-                                                />
-                                                <label className="btn btn-outline-primary w-100" htmlFor="seated">Seated</label>
-
-                                                <input 
-                                                    type="radio" className="btn-check" name="seatType" id="standing" 
-                                                    checked={formData.seat_type === 'standing'}
-                                                    onChange={() => setFormData({...formData, seat_type: 'standing'})}
-                                                />
-                                                <label className="btn btn-outline-warning w-100" htmlFor="standing">Standing</label>
-                                            </div>
-                                        </div>
+                                    <div className="mb-4">
+                                        <label className="form-label text-muted small fw-bold">Assign Seat</label>
+                                        <select 
+                                            className="form-select border-2" 
+                                            value={formData.seat_id}
+                                            onChange={(e) => setFormData({...formData, seat_id: e.target.value})}
+                                            required
+                                        >
+                                            <option value="">-- Select a Seat --</option>
+                                            {seats.map(seat => (
+                                                <option key={seat.id} value={seat.id}>
+                                                    {seat.seat_number} ({seat.seat_type})
+                                                </option>
+                                            ))}
+                                        </select>
                                     </div>
 
                                     <div className="d-flex gap-2 mt-4">
-                                        <button type="submit" className="btn btn-primary px-4 py-2 fw-bold flex-grow-1 rounded-3 shadow-sm">
+                                        <button type="submit" className="btn btn-primary px-4 py-2 fw-bold flex-grow-1">
                                             Save Changes
                                         </button>
-                                        <button type="button" className="btn btn-light px-4 py-2 fw-bold rounded-3" onClick={() => navigate(-1)}>
+                                        <button type="button" className="btn btn-light px-4 py-2" onClick={() => navigate(-1)}>
                                             Cancel
                                         </button>
                                     </div>

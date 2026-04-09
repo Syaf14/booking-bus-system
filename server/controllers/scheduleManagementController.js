@@ -27,6 +27,7 @@ exports.getAllSchedule = async (req, res) => {
             SELECT 
                 sb.id,
                 sb.route_id,
+                sb.status,
                 br.depart_location,
                 br.depart_time,
                 br.arrive_location,
@@ -37,7 +38,9 @@ exports.getAllSchedule = async (req, res) => {
             FROM scheduled_bus sb
             LEFT JOIN bus_routes br ON br.id = sb.route_id
             LEFT JOIN buses b ON b.id = br.bus_id
-            WHERE sb.deleted_at IS NULL
+            WHERE sb.status = 'active' AND sb.deleted_at IS NULL AND br.deleted_at IS NULL
+            ORDER BY FIELD(br.day_assigned, 'isnin', 'selasa', 'rabu', 'khamis', 'jumaat'), 
+                     br.depart_time ASC
         `;
         
         const [rows] = await db.query(sql);
@@ -55,6 +58,7 @@ exports.getScheduleById = async (req, res) => {
             SELECT 
                 sb.id,
                 sb.route_id,
+                sb.status,
                 b.bus_code,
                 br.depart_location,
                 br.arrive_location,
@@ -83,17 +87,41 @@ exports.getScheduleById = async (req, res) => {
 exports.deleteSchedule = async (req, res) => {
     try {
         const id = req.params.id;
-        const sql = 'UPDATE scheduled_bus SET deleted_at = NOW() WHERE id = ?';
+        // FIX: Wrap 'inactive' in single quotes
+        const sql = "UPDATE scheduled_bus SET status = 'inactive' WHERE id = ?";
 
         const [result] = await db.query(sql, [id]);
 
         if (result.affectedRows > 0) {
-            res.json({ message: "Scheduled Bus deleted successfully" });
+            res.json({ message: "Scheduled Bus marked as inactive successfully" });
         } else {
-            res.status(404).json({ message: "Route not found" });
+            res.status(404).json({ message: "Schedule not found" });
         }
     } catch (err) {
         console.error("Delete error:", err);
-        res.status(500).json({ message: "Delete failed", error: err.message });
+        res.status(500).json({ message: "Operation failed", error: err.message });
+    }
+};
+
+exports.reactivateSchedule = async (req, res) => {
+    try {
+        const { route_ids } = req.body; // Expecting array: [4, 8, 12]
+
+        if (!route_ids || !Array.isArray(route_ids) || route_ids.length === 0) {
+            return res.status(400).json({ message: "No schedules selected for reactivation" });
+        }
+
+        // Update multiple records at once to 'active' where the route_id matches
+        const sql = "UPDATE scheduled_bus SET status = 'active' WHERE route_id IN (?)";
+        
+        const [result] = await db.query(sql, [route_ids]);
+
+        res.json({ 
+            message: `${result.affectedRows} schedules reactivated successfully`,
+            affectedRows: result.affectedRows 
+        });
+    } catch (err) {
+        console.error("Reactivation Error:", err);
+        res.status(500).json({ message: "Server error during reactivation", error: err.message });
     }
 };

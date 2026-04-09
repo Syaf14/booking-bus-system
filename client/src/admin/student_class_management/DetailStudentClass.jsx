@@ -56,7 +56,7 @@ function DetailStudentClass() {
                     <button onClick={() => navigate(-1)} className="btn btn-link text-decoration-none text-muted p-0">
                         <i className="bi bi-arrow-left me-2"></i>Back to Management
                     </button>
-                    <button className="btn btn-primary px-4 shadow-sm" onClick={() => navigate(`/edit-student-class/${id}`)}>
+                    <button className="btn btn-primary px-4 shadow-sm" onClick={() => navigate(`/admin-edit-student-classes-management/${id}`)}>
                         <i className="bi bi-pencil-square me-2"></i>Edit Class
                     </button>
                 </div>

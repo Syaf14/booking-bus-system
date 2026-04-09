@@ -65,3 +65,28 @@ exports.getBookingById = async (req, res) => {
         res.status(500).json({ message: "Database error", error: err.message });
     }
 };
+
+exports.updateBooking = async (req, res) => {
+    const { id } = req.params; // Booking ID
+    const { status, seat_id } = req.body; // Expecting seat_id from the dropdown
+
+    try {
+        // We update the 'bookings' table using the specific booking ID
+        const sql = `
+            UPDATE bookings 
+            SET status = ?, 
+                seat_id = ? 
+            WHERE id = ?`;
+        
+        const [result] = await db.query(sql, [status, seat_id, id]);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: "Booking not found" });
+        }
+
+        res.status(200).json({ message: "Booking updated successfully" });
+    } catch (err) {
+        console.error("Update Error:", err);
+        res.status(500).json({ message: "Database error during update", error: err.message });
+    }
+};
