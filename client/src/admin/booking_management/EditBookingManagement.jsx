@@ -22,11 +22,11 @@ function EditBookingManagement() {
                 setLoading(true);
                 
                 // 1. Fetch Booking Details
-                const bookingRes = await axios.get(`http://localhost:5000/api/bookingManagement/get-booking-by-id/${id}`);
+                const bookingRes = await axios.get(`http://localhost:3001/api/bookingManagement/get-booking-by-id/${id}`);
                 const bData = bookingRes.data;
 
                 // 2. Fetch All Available Seats
-                const seatsRes = await axios.get(`http://localhost:5000/api/busManagement/get-bus-seat/`);
+                const seatsRes = await axios.get(`http://localhost:3001/api/busManagement/get-bus-seat/`);
                 setSeats(seatsRes.data);
 
                 setFormData({
@@ -50,7 +50,7 @@ function EditBookingManagement() {
         e.preventDefault();
         try {
             // Sending seat_id and status to the backend
-            await axios.put(`http://localhost:5000/api/bookingManagement/update-booking/${id}`, {
+            await axios.put(`http://localhost:3001/api/bookingManagement/update-booking/${id}`, {
                 status: formData.status,
                 seat_id: formData.seat_id
             });

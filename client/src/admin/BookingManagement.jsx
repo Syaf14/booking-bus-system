@@ -15,7 +15,7 @@ function BookingManagement() {
 
     const fetchBooking = async () => {
         try {
-            const response = await axios.get("http://localhost:5000/api/bookingManagement/get-booking-management");
+            const response = await axios.get("http://localhost:3001/api/bookingManagement/get-booking-management");
             setBooking(response.data);
         } catch (err) {
             console.error(err);

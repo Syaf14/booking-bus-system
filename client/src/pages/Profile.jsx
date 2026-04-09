@@ -13,7 +13,7 @@ function Profile() {
     const fetchProfile = async () => {
       try {
         // Ensure your backend query now joins with student_classes to get the class name
-        const response = await axios.get(`http://localhost:5000/api/auth/user-profile/${id}`);
+        const response = await axios.get(`http://localhost:3001/api/auth/user-profile/${id}`);
         setProfile(response.data);
       } catch (err) {
         console.error("Error fetching profile:", err);

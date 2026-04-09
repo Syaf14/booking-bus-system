@@ -11,7 +11,7 @@ function Ticket() {
 
   const fetchMyTickets = useCallback(async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/bookingManagement/get-ticket/${id}`);
+      const response = await axios.get(`http://localhost:3001/api/bookingManagement/get-ticket/${id}`);
       setTickets(response.data);
     } catch (err) {
       console.error("Error loading tickets:", err);
@@ -27,7 +27,7 @@ function Ticket() {
   const handleDeleteBooking = async (bookingId) => {
     if (!window.confirm("Are you sure you want to cancel this booking?")) return;
     try {
-      const response = await axios.delete(`http://localhost:5000/api/bookingManagement/delete-booking/${bookingId}`);
+      const response = await axios.delete(`http://localhost:3001/api/bookingManagement/delete-booking/${bookingId}`);
       if (response.status === 200) { 
         fetchMyTickets(); 
       }

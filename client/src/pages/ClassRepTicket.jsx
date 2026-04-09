@@ -11,7 +11,7 @@ function ClassRepTicket() {
 
   const fetchMyTickets = useCallback(async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/bookingManagement/get-ticket/${id}`);
+      const response = await axios.get(`http://localhost:3001/api/bookingManagement/get-ticket/${id}`);
       setTickets(response.data);
     } catch (err) {
       console.error("Error loading tickets:", err);
@@ -27,7 +27,7 @@ function ClassRepTicket() {
   const handleDeleteBooking = async (bookingId) => {
     if (!window.confirm("Cancel your personal seat for this trip?")) return;
     try {
-      const response = await axios.delete(`http://localhost:5000/api/bookingManagement/delete-booking/${bookingId}`);
+      const response = await axios.delete(`http://localhost:3001/api/bookingManagement/delete-booking/${bookingId}`);
       if (response.status === 200) fetchMyTickets();
     } catch (err) {
       console.error("Failed to delete booking:", err);
@@ -41,7 +41,7 @@ function ClassRepTicket() {
     try {
       const token = localStorage.getItem('token');
       const response = await axios.delete(
-        `http://localhost:5000/api/bookingManagement/class-booking-delete`,
+        `http://localhost:3001/api/bookingManagement/class-booking-delete`,
         {
           headers: { Authorization: `Bearer ${token}` },
           data: { scheduled_id: ticket.scheduled_id, class_id: ticket.class_id }

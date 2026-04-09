@@ -16,7 +16,7 @@ function DetailStudentClass() {
     const fetchDetail = async () => {
         try {
             setLoading(true);
-            const response = await axios.get(`http://localhost:5000/api/studentClassManagement/get-all-student-classes-by-id/${id}`);
+            const response = await axios.get(`http://localhost:3001/api/studentClassManagement/get-all-student-classes-by-id/${id}`);
             setClassData(response.data);
         } catch (error) {
             console.error("Error fetching class details:", error);

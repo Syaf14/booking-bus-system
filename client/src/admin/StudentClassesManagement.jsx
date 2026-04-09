@@ -15,7 +15,7 @@ function StudentClassesManagement() {
     const fetchStudentClasses = async () => {
         try {
             console.log("Attempting to fetch from API...");
-            const response = await axios.get(`http://localhost:5000/api/studentClassManagement/get-all-student-classes`);
+            const response = await axios.get(`http://localhost:3001/api/studentClassManagement/get-all-student-classes`);
             
             console.log("Full API Response:", response);
             console.log("Data received:", response.data);

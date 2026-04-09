@@ -13,7 +13,7 @@ function ClassRepDashboard() {
 
   const fetchTimeTable = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/scheduleManagement/get-all-schedule-bus");
+      const response = await axios.get("http://localhost:3001/api/scheduleManagement/get-all-schedule-bus");
       setTimeTable(response.data);
     } catch (err) {
       console.error(err);

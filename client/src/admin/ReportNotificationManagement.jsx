@@ -13,7 +13,7 @@ function ReportNotificationManagement() {
 
   const fetchReports = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/reportManagement/get-report`);
+      const response = await axios.get(`http://localhost:3001/api/reportManagement/get-report`);
       setReports(response.data);
       setLoading(false);
     } catch (error) {
@@ -34,7 +34,7 @@ function ReportNotificationManagement() {
   const handleSolve = async (id) => {
     if (!window.confirm("Mark this report as Resolved?")) return;
     try {
-      await axios.put(`http://localhost:5000/api/reportManagement/update-status/${id}`);
+      await axios.put(`http://localhost:3001/api/reportManagement/update-status/${id}`);
       fetchReports();
     } catch (error) {
       alert("Failed to update status");

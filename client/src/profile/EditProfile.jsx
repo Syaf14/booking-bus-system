@@ -18,7 +18,7 @@ function EditProfile() {
     useEffect(() => {
         const fetchProfile = async () => {
             try {
-                const response = await axios.get(`http://localhost:5000/api/auth/user-profile/${id}`);
+                const response = await axios.get(`http://localhost:3001/api/auth/user-profile/${id}`);
                 setProfile({
                     full_name: response.data.full_name || '',
                     phone_no: response.data.phone_no || '',
@@ -43,7 +43,7 @@ function EditProfile() {
 
     const handleSave = async () => {
         try {
-            await axios.put(`http://localhost:5000/api/auth/update-profile/${id}`, profile);
+            await axios.put(`http://localhost:3001/api/auth/update-profile/${id}`, profile);
             alert("Profile updated successfully!");
             navigate(`/profile/${id}`);
         } catch (err) {

@@ -12,7 +12,7 @@ function DetailScheduleManagement() {
     useEffect(() => {
         const fetchDetails = async () => {
             try {
-                const res = await axios.get(`http://localhost:5000/api/scheduleManagement/get-schedule-by-id/${id}`);
+                const res = await axios.get(`http://localhost:3001/api/scheduleManagement/get-schedule-by-id/${id}`);
                 setData(res.data);
                 setLoading(false);
             } catch (err) {
@@ -26,7 +26,7 @@ function DetailScheduleManagement() {
     const handleDelete = async (id) => {
         if (!window.confirm("Delete this schedule?")) return;
         try {
-            await axios.delete(`http://localhost:5000/api/scheduleManagement/delete-schedule-bus/${id}`);
+            await axios.delete(`http://localhost:3001/api/scheduleManagement/delete-schedule-bus/${id}`);
         } catch (err) { console.error(err); }
     };
 

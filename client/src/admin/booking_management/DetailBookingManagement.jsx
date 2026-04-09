@@ -12,7 +12,7 @@ function DetailBookingManagement() {
         // Replace with your actual fetch logic
         const fetchDetail = async () => {
             try {
-                const res = await axios.get(`http://localhost:5000/api/bookingManagement/get-booking-by-id/${id}`);
+                const res = await axios.get(`http://localhost:3001/api/bookingManagement/get-booking-by-id/${id}`);
                 setBooking(res.data);
             } catch (err) { console.error(err); }
         };

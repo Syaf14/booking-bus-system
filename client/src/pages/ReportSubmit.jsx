@@ -20,7 +20,7 @@ function ReportSubmit() {
         e.preventDefault();
         setSubmitting(true);
         try {
-            const response = await axios.post('http://localhost:5000/api/reportManagement/submit-report', formData);
+            const response = await axios.post('http://localhost:3001/api/reportManagement/submit-report', formData);
             
             if (response.data.success || response.status === 201) {
                 alert("Report submitted successfully!");

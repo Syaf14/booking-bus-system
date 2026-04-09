@@ -21,8 +21,8 @@ function EditBusRoute() {
     const fetchData = async () => {
       try {
         const [routeRes, busesRes] = await Promise.all([
-          axios.get(`http://localhost:5000/api/busManagement/get-bus-route/${id}`),
-          axios.get(`http://localhost:5000/api/busManagement/all-buses`) // You'll need this endpoint
+          axios.get(`http://localhost:3001/api/busManagement/get-bus-route/${id}`),
+          axios.get(`http://localhost:3001/api/busManagement/all-buses`) // You'll need this endpoint
         ]);
         
         setFormData(routeRes.data);
@@ -41,7 +41,7 @@ function EditBusRoute() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(`http://localhost:5000/api/busManagement/update-bus-route/${id}`, formData);
+      await axios.put(`http://localhost:3001/api/busManagement/update-bus-route/${id}`, formData);
       alert("Updated successfully!");
       navigate('/admin-bus-management');
     } catch (err) {

@@ -22,7 +22,7 @@ function Register() {
   useEffect(() => {
       const fetchStudentClass = async () => {
         try {
-          const response = await axios.get(`http://localhost:5000/api/userManagement/all-student-classes`);      
+          const response = await axios.get(`http://localhost:3001/api/userManagement/all-student-classes`);      
           setStudentClasses(response.data);          
         } catch (err) {
           console.log("Failed to fetch student class:", err);

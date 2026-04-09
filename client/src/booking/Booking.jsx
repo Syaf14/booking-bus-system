@@ -10,7 +10,7 @@ function Booking() {
   const [selectedDay, setSelectedDay] = useState('isnin');
 
   useEffect(() => {
-    axios.get(`http://localhost:5000/api/scheduleManagement/get-all-schedule-bus`)
+    axios.get(`http://localhost:3001/api/scheduleManagement/get-all-schedule-bus`)
       .then(res => setSchedule(res.data))
       .catch(err => console.error("Error fetching schedules:", err));
   }, [])

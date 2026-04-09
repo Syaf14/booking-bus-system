@@ -21,7 +21,7 @@ function ScheduleManagement() {
 
     const fetchSchedule = async () => {
         try {
-            const response = await axios.get("http://localhost:5000/api/scheduleManagement/get-all-schedule-bus");
+            const response = await axios.get("http://localhost:3001/api/scheduleManagement/get-all-schedule-bus");
             setSchedule(response.data);
         } catch (err) {
             console.error(err);
@@ -31,7 +31,7 @@ function ScheduleManagement() {
     const handleDelete = async (id) => {
         if (!window.confirm("Delete this schedule?")) return;
         try {
-            await axios.delete(`http://localhost:5000/api/scheduleManagement/delete-schedule-bus/${id}`);
+            await axios.delete(`http://localhost:3001/api/scheduleManagement/delete-schedule-bus/${id}`);
             fetchSchedule();
         } catch (err) { console.error(err); }
     };

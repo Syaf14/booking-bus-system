@@ -16,7 +16,7 @@ function EditBus() {
     useEffect(() => {
         const fetchBusDetails = async () => {
             try {
-                const response = await axios.get(`http://localhost:5000/api/busManagement/get-bus/${id}`);
+                const response = await axios.get(`http://localhost:3001/api/busManagement/get-bus/${id}`);
                 setBus(response.data);
             } catch (err) {
                 console.error("Error fetching bus details:", err);
@@ -35,7 +35,7 @@ function EditBus() {
 
     const handleSave = async () => {
         try {
-            await axios.put(`http://localhost:5000/api/busManagement/update-bus/${id}`, bus);
+            await axios.put(`http://localhost:3001/api/busManagement/update-bus/${id}`, bus);
             alert("Bus updated successfully!");
             navigate('/admin-bus-management');
         } catch (err) {

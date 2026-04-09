@@ -17,7 +17,7 @@ function EditStudentClass() {
     useEffect(() => {
         const fetchClassData = async () => {
             try {
-                const res = await axios.get(`http://localhost:5000/api/studentClassManagement/get-all-student-classes-by-id/${id}`);
+                const res = await axios.get(`http://localhost:3001/api/studentClassManagement/get-all-student-classes-by-id/${id}`);
                 setFormData({
                     class_name: res.data.class_name,
                     semester: res.data.semester,
@@ -46,7 +46,7 @@ function EditStudentClass() {
                 capacity_class: formData.capacity_class
             };
 
-            await axios.put(`http://localhost:5000/api/studentClassManagement/update-student-class/${id}`, payload);
+            await axios.put(`http://localhost:3001/api/studentClassManagement/update-student-class/${id}`, payload);
             alert("Class Updated Successfully!");
             navigate('/admin-student-classes-management');
         } catch (err) {

@@ -29,7 +29,7 @@ function AddAdmin() {
             return;
         }
         try {
-        const res = await axios.post(`http://localhost:5000/api/auth/register-admin`, form);
+        const res = await axios.post(`http://localhost:3001/api/auth/register-admin`, form);
         setMessage({ type: "success", text: res.data.message });
         } catch (error) {
         setMessage({ 

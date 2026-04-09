@@ -13,7 +13,7 @@ function AddScheduleManagement() {
 
     const fetchRoutes = () => {
         setLoading(true);
-        axios.get(`http://localhost:5000/api/busManagement/get-available-bus-route`)
+        axios.get(`http://localhost:3001/api/busManagement/get-available-bus-route`)
             .then(res => {
                 setBusRoute(res.data);
                 setLoading(false);
@@ -53,10 +53,10 @@ function AddScheduleManagement() {
         try {
             const requests = [];
             if (idsToCreate.length > 0) {
-                requests.push(axios.post("http://localhost:5000/api/scheduleManagement/add-schedule-bus", { route_ids: idsToCreate }));
+                requests.push(axios.post("http://localhost:3001/api/scheduleManagement/add-schedule-bus", { route_ids: idsToCreate }));
             }
             if (idsToReactivate.length > 0) {
-                requests.push(axios.post("http://localhost:5000/api/scheduleManagement/reactivate-schedule", { route_ids: idsToReactivate }));
+                requests.push(axios.post("http://localhost:3001/api/scheduleManagement/reactivate-schedule", { route_ids: idsToReactivate }));
             }
             await Promise.all(requests);
             alert("Deployment complete!");

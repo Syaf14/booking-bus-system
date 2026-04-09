@@ -26,14 +26,14 @@ function BusManagement() {
 
     const fetchBuses = async () => {
         try {
-            const response = await axios.get("http://localhost:5000/api/busManagement/all-buses");
+            const response = await axios.get("http://localhost:3001/api/busManagement/all-buses");
             setBuses(response.data);
         } catch (err) { console.error(err); }
     };
 
     const fetchBusRoutes = async () => {
         try {
-            const response = await axios.get("http://localhost:5000/api/busManagement/all-bus-route");
+            const response = await axios.get("http://localhost:3001/api/busManagement/all-bus-route");
             setBusRoute(response.data);
         } catch (err) { console.error(err); }
     };
@@ -66,7 +66,7 @@ function BusManagement() {
     const handleDelete = async (id) => {
         if (!window.confirm("Delete this bus?")) return;
         try {
-            await axios.delete(`http://localhost:5000/api/busManagement/delete-bus/${id}`);
+            await axios.delete(`http://localhost:3001/api/busManagement/delete-bus/${id}`);
             fetchBuses();
         } catch (err) { console.error(err); }
     };
@@ -74,7 +74,7 @@ function BusManagement() {
     const handleDeleteRoute = async (id) => {
         if (!window.confirm("Are you sure you want to delete this bus route?")) return;
         try {
-            const response = await axios.delete(`http://localhost:5000/api/busManagement/delete-bus-route/${id}`);
+            const response = await axios.delete(`http://localhost:3001/api/busManagement/delete-bus-route/${id}`);
             if (response.status === 200) { fetchBusRoutes(); }
         } catch (err) { console.error("Failed to delete route:", err); }
     };

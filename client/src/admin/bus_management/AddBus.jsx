@@ -16,7 +16,7 @@ function AddBus() {
     e.preventDefault();
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/busManagement/add-bus",
+        "http://localhost:3001/api/busManagement/add-bus",
         {
           bus_code: busCode,
           bus_name: busName,

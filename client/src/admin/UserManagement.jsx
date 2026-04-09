@@ -19,7 +19,7 @@ function UserManagement() {
             // Note: If your backend "get-all-user" only returns role='student', 
             // you'll need to update the backend SQL to remove the WHERE clause 
             // or create a new endpoint for admins.
-            const response = await axios.get("http://localhost:5000/api/userManagement/get-all-user");
+            const response = await axios.get("http://localhost:3001/api/userManagement/get-all-user");
             setUsers(response.data);
             setLoading(false);
         } catch (error) {
@@ -31,7 +31,7 @@ function UserManagement() {
     const handleDelete = async (id) => {
         if (window.confirm("Are you sure? This action cannot be undone.")) {
             try {
-                await axios.delete(`http://localhost:5000/api/userManagement/delete-user/${id}`);
+                await axios.delete(`http://localhost:3001/api/userManagement/delete-user/${id}`);
                 fetchUsers();
             } catch (error) {
                 alert("Error deleting user");

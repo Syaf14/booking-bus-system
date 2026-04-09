@@ -13,7 +13,7 @@ const UserLayout = ({ children }) => {
     const fetchUserRole = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get('http://localhost:5000/api/auth/profile', {
+        const response = await axios.get('http://localhost:3001/api/auth/profile', {
           headers: { Authorization: `Bearer ${token}` }
         });
         
@@ -32,7 +32,7 @@ const UserLayout = ({ children }) => {
   const userRole = localStorage.getItem('role');
 
   const handleLogout = () => {
-    axios.post('http://localhost:5000/api/auth/logout');
+    axios.post('http://localhost:3001/api/auth/logout');
     localStorage.removeItem('token');
     navigate('/');
   };

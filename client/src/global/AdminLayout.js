@@ -7,7 +7,7 @@ const AdminLayout = ({ children }) => {
 
   const handleLogout = () => {
     // Optional: Call backend logout if you have session logic there
-    axios.post('http://localhost:5000/api/auth/logout').catch(err => console.log(err)); 
+    axios.post('http://localhost:3001/api/auth/logout').catch(err => console.log(err)); 
     localStorage.removeItem('token'); 
     navigate('/');
   };

@@ -54,17 +54,17 @@ function SeatBook() {
                 const token = localStorage.getItem('token');
                 
                 // 1. Fetch Schedule Details
-                const schedRes = await axios.get(`http://localhost:5000/api/scheduleManagement/get-schedule-by-id/${id}`);
+                const schedRes = await axios.get(`http://localhost:3001/api/scheduleManagement/get-schedule-by-id/${id}`);
                 setSchedule(schedRes.data);
 
                 // 2. Fetch All Seats for the layout
-                const seatsRes = await axios.get(`http://localhost:5000/api/busManagement/get-bus-seat`);
+                const seatsRes = await axios.get(`http://localhost:3001/api/busManagement/get-bus-seat`);
                 
                 // 3. Fetch specifically which seats are already taken for THIS schedule
                 // Note: If you haven't built this backend route yet, it might return 404. 
                 // Catching it ensures the rest of the seats still show up.
                 try {
-                    const takenRes = await axios.get(`http://localhost:5000/api/bookingManagement/get-booked-seats/${id}`);
+                    const takenRes = await axios.get(`http://localhost:3001/api/bookingManagement/get-booked-seats/${id}`);
                     // Force everything to a Number to ensure the .includes() matches correctly
                     setBookedSeats(takenRes.data.map(b => Number(b.seat_id)));
                 } catch (e) {
@@ -126,7 +126,7 @@ function SeatBook() {
             };
 
             const response = await axios.post(
-                'http://localhost:5000/api/bookingManagement/add-booking', 
+                'http://localhost:3001/api/bookingManagement/add-booking', 
                 bookingData,
                 { headers: { Authorization: `Bearer ${token}` } }
             );

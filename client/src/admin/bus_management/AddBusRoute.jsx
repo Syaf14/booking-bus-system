@@ -17,7 +17,7 @@ function AddBusRoute() {
     })
 
     useEffect(() => {
-        axios.get("http://localhost:5000/api/busManagement/all-buses")
+        axios.get("http://localhost:3001/api/busManagement/all-buses")
             .then(res => setBusId(res.data))
             .catch(err => console.error(err));
     }, []);
@@ -32,7 +32,7 @@ function AddBusRoute() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.post("http://localhost:5000/api/busManagement/add-bus-route", form);
+            await axios.post("http://localhost:3001/api/busManagement/add-bus-route", form);
 
             const selectedBus = busId.find(bus => bus.id === parseInt(form.bus_id));
             setMessage({ 

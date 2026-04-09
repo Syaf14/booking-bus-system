@@ -17,7 +17,7 @@ function AdminDashboard() {
 
   const fetchUsers = async() => {
     try {
-      const res = await axios.get(`http://localhost:5000/api/userManagement/get-all-user`);
+      const res = await axios.get(`http://localhost:3001/api/userManagement/get-all-user`);
       setUsers(res.data)
     } catch (err) {
       console.log("Error fetch User: ", err)
@@ -25,7 +25,7 @@ function AdminDashboard() {
   }
   const fetchActiveBus = async() => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/bookingManagement/get-booking-management`);
+      const response = await axios.get(`http://localhost:3001/api/bookingManagement/get-booking-management`);
       setBooking(response.data)
     } catch (err) {
       console.log("Error fetch Booking: ", err)
@@ -33,7 +33,7 @@ function AdminDashboard() {
   }
   const fetchBooking = async() => {
     try {
-      const res = await axios.get(`http://localhost:5000/api/busManagement/all-buses`);
+      const res = await axios.get(`http://localhost:3001/api/busManagement/all-buses`);
       setActiveBus(res.data)
     } catch (err) {
       console.log("Error fetch Bus: ", err)

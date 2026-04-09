@@ -20,8 +20,8 @@ function EditStudentManagement() {
     useEffect(() => {
         const fetchUser = async () => {
             try {
-                const userRes = await axios.get(`http://localhost:5000/api/userManagement/get-all-user-by-id/${id}`);
-                const classRes = await axios.get(`http://localhost:5000/api/userManagement/get-active-class`);
+                const userRes = await axios.get(`http://localhost:3001/api/userManagement/get-all-user-by-id/${id}`);
+                const classRes = await axios.get(`http://localhost:3001/api/userManagement/get-active-class`);
                 setFormData({
                     ...userRes.data,
                     class_id: userRes.data.class_id || '' // Ensure it's not null for the select
@@ -41,7 +41,7 @@ function EditStudentManagement() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.put(`http://localhost:5000/api/userManagement/update-user/${id}`, formData);
+            await axios.put(`http://localhost:3001/api/userManagement/update-user/${id}`, formData);
             alert("User updated successfully!");
             navigate('/admin-user-management'); // Adjust route to your user list page
         } catch (err) {
