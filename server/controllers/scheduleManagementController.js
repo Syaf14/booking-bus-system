@@ -112,9 +112,10 @@ exports.reactivateSchedule = async (req, res) => {
         }
 
         // Update multiple records at once to 'active' where the route_id matches
-        const sql = "UPDATE scheduled_bus SET status = 'active' WHERE route_id IN (?)";
+        const placeholders = route_ids.map(() => '?').join(',');
+        const sql = `UPDATE scheduled_bus SET status = 'active' WHERE route_id IN (${placeholders})`;
         
-        const [result] = await db.query(sql, [route_ids]);
+        const [result] = await db.query(sql, route_ids);
 
         res.json({ 
             message: `${result.affectedRows} schedules reactivated successfully`,
